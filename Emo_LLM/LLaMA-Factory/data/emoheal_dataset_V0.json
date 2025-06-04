@@ -1,0 +1,512 @@
+[
+  {
+    "instruction": "周围太吵了，我感觉要爆炸了，需要一点安静。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second serene ambient track with minimalistic piano, very slow tempo (50 BPM), featuring soft pads and gentle ASMR-like rain sounds, designed to soothe an overstimulated mind and promote tranquility.\", \"image_prompt\": \"Minimalist abstract art depicting a calm, expansive space. Soft, desaturated cool colors like pale blue and grey. Diffused lighting, gentle gradients, and a sense of profound quietness and peace. No sharp edges or jarring elements.\", \"voice_text\": \"听到你觉得周围太吵闹，让你感到心烦意乱，这一定很难受。别担心，找一个稍微安静点的地方，或者戴上耳机。我们为你准备了特别宁静的音乐和画面，希望能帮你隔绝纷扰，找回内心的平静。\"}"
+  },
+  {
+    "instruction": "It's too noisy around me, I feel like I'm going to explode, I need some quiet.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second serene ambient track with minimalistic piano, very slow tempo (50 BPM), featuring soft pads and gentle ASMR-like rain sounds, designed to soothe an overstimulated mind and promote tranquility.\", \"image_prompt\": \"Minimalist abstract art depicting a calm, expansive space. Soft, desaturated cool colors like pale blue and grey. Diffused lighting, gentle gradients, and a sense of profound quietness and peace. No sharp edges or jarring elements.\", \"voice_text\": \"I hear that it's too noisy and you're feeling overwhelmed by it, that must be very uncomfortable. Don't worry, try to find a quieter spot, or perhaps use headphones. We've prepared some especially peaceful music and visuals for you, hoping they can help you block out the noise and rediscover your inner calm.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "明天有个重要的考试，我现在紧张得睡不着，怎么办？",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second deeply calming binaural beat track (theta waves for relaxation) layered with gentle, slow-paced harp melodies and soft nature sounds like crickets, aimed at reducing pre-exam anxiety and aiding sleep.\", \"image_prompt\": \"Serene night sky landscape illustration. A vast, starry sky with a soft glowing moon, overlooking a calm, still lake. Deep indigo and silver palette. Evokes a sense of peace, stillness, and quiet confidence.\", \"voice_text\": \"感觉到你因为明天的考试而紧张得睡不着，这份压力一定让你很不好受。深呼吸，告诉自己已经尽力了。现在，请尝试放松下来，我们为你准备了能帮助舒缓紧张情绪的音乐和画面，希望能伴你平静入眠。\"}"
+  },
+  {
+    "instruction": "I have an important exam tomorrow and I'm too nervous to sleep, what should I do?",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second deeply calming binaural beat track (theta waves for relaxation) layered with gentle, slow-paced harp melodies and soft nature sounds like crickets, aimed at reducing pre-exam anxiety and aiding sleep.\", \"image_prompt\": \"Serene night sky landscape illustration. A vast, starry sky with a soft glowing moon, overlooking a calm, still lake. Deep indigo and silver palette. Evokes a sense of peace, stillness, and quiet confidence.\", \"voice_text\": \"I sense you're feeling very nervous about tomorrow's exam and it's keeping you from sleeping; that pressure must be tough. Take a deep breath and remind yourself that you've done your best. Now, try to relax. We've prepared some music and visuals designed to soothe anxiety, hoping they can help you drift into a peaceful sleep.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我感觉心慌慌的，手心出汗，是不是焦虑发作了？",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second soothing ambient piece featuring slow, rhythmic breathing-like pads, gentle flowing water sounds, and a single, reassuring melodic line from a soft flute. Designed for grounding during anxiety.\", \"image_prompt\": \"Abstract calming art with soft, diffused shapes in light teal and lavender. Flowing, gentle movements, no hard edges. A central, softly glowing orb suggesting inner peace. Overall impression of safety and tranquility.\", \"voice_text\": \"听起来你现在感觉很不好，心慌、手心出汗确实可能是焦虑的信号。别害怕，这只是身体的一种反应。尝试慢慢地深呼吸，专注于当下。我们为你准备了一些平静的音乐和画面，希望能帮你稳住心神，让这种不适感慢慢退去。\"}"
+  },
+  {
+    "instruction": "My heart is pounding and my palms are sweaty, am I having an anxiety attack?",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second soothing ambient piece featuring slow, rhythmic breathing-like pads, gentle flowing water sounds, and a single, reassuring melodic line from a soft flute. Designed for grounding during anxiety.\", \"image_prompt\": \"Abstract calming art with soft, diffused shapes in light teal and lavender. Flowing, gentle movements, no hard edges. A central, softly glowing orb suggesting inner peace. Overall impression of safety and tranquility.\", \"voice_text\": \"It sounds like you're feeling quite unwell right now; a racing heart and sweaty palms can indeed be signs of anxiety. Don't be scared, it's just your body's reaction. Try to take slow, deep breaths and focus on the present moment. We've prepared some calming music and visuals for you, hoping they can help you feel grounded and ease these sensations.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "刚跟家里人吵了一架，心情特别烦躁，静不下来。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second piece of meditative music with a grounding handpan rhythm, layered with a very slow, melancholic cello melody that resolves into a peaceful chord. Sounds of gentle wind chimes for release.\", \"image_prompt\": \"Impressionistic art of a misty forest path at dawn. Soft, muted greens and greys, with a hint of emerging sunlight. The path invites a gentle walk. Atmosphere of quiet reflection and emotional release leading to calm.\", \"voice_text\": \"和家人吵架确实很让人心烦，那种情绪激动的感觉肯定不好受。给自己一点时间冷静下来，情绪平复了才能更好地沟通。现在，请放松，我们准备了些能帮助你平复心绪的音乐和画面，愿你能从中找到片刻安宁。\"}"
+  },
+  {
+    "instruction": "I just had a fight with my family, I'm so agitated and can't calm down.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second piece of meditative music with a grounding handpan rhythm, layered with a very slow, melancholic cello melody that resolves into a peaceful chord. Sounds of gentle wind chimes for release.\", \"image_prompt\": \"Impressionistic art of a misty forest path at dawn. Soft, muted greens and greys, with a hint of emerging sunlight. The path invites a gentle walk. Atmosphere of quiet reflection and emotional release leading to calm.\", \"voice_text\": \"Fighting with family is indeed upsetting, and that feeling of agitation must be very uncomfortable. Give yourself some time to cool down; clear communication often comes after emotions settle. For now, please relax. We've prepared some music and visuals to help soothe your mind, hoping you can find a moment of peace.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "晚上总是胡思乱想，翻来覆去睡不着，有没有办法让我平静下来好好睡觉？",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second ultra-slow ambient soundscape, like a gentle lullaby. Features soft, ethereal choir pads, Tibetan singing bowl resonance, and very subtle heartbeat rhythm. Designed for deep relaxation and inducing sleep.\", \"image_prompt\": \"Dreamlike abstract image of soft, swirling clouds in deep blues and purples, with tiny sparkling stars. A sense of gentle, floating movement. Visual lullaby to ease the mind into sleep. Minimalist and serene.\", \"voice_text\": \"晚上思绪万千难以入睡，这一定让你很困扰。没关系，很多人都有这样的经历。尝试放空大脑，专注于呼吸。我们为你准备了特别设计的助眠音乐和画面，希望能引导你进入一个宁静放松的状态，安然入梦。\"}"
+  },
+  {
+    "instruction": "I always overthink at night, tossing and turning, unable to sleep. Is there anything to help me calm down and sleep well?",
+    "input": "",
+    "output": "{\"emotion_tag\": \"calmness\", \"music_prompt\": \"A 30-second ultra-slow ambient soundscape, like a gentle lullaby. Features soft, ethereal choir pads, Tibetan singing bowl resonance, and very subtle heartbeat rhythm. Designed for deep relaxation and inducing sleep.\", \"image_prompt\": \"Dreamlike abstract image of soft, swirling clouds in deep blues and purples, with tiny sparkling stars. A sense of gentle, floating movement. Visual lullaby to ease the mind into sleep. Minimalist and serene.\", \"voice_text\": \"It must be very troubling to have racing thoughts at night keeping you from sleep. It's okay, many people experience this. Try to empty your mind and focus on your breath. We've prepared specially designed sleep-inducing music and visuals for you, hoping to guide you into a state of tranquility and peaceful dreams.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "最近感觉好孤独，没什么人可以说话。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second warm, gentle acoustic guitar piece with a simple, uplifting melody. Slow tempo (60 BPM), accompanied by soft, subtle string harmonies. Evokes feelings of warmth and companionship.\", \"image_prompt\": \"A cozy, warm illustration of a comfortable armchair by a softly glowing fireplace, with a book and a warm drink nearby. Soft textures, warm color palette (oranges, reds, browns). Atmosphere of safety and gentle companionship.\", \"voice_text\": \"感到孤独的时候，心里一定空落落的。请记得，即使暂时没有人陪伴，你也不是一个人在承受。我们在这里，为你准备了一些温暖的音乐和画面，希望能给你带来一丝慰藉和陪伴的感觉。\"}"
+  },
+  {
+    "instruction": "I've been feeling so lonely lately, there's no one to talk to.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second warm, gentle acoustic guitar piece with a simple, uplifting melody. Slow tempo (60 BPM), accompanied by soft, subtle string harmonies. Evokes feelings of warmth and companionship.\", \"image_prompt\": \"A cozy, warm illustration of a comfortable armchair by a softly glowing fireplace, with a book and a warm drink nearby. Soft textures, warm color palette (oranges, reds, browns). Atmosphere of safety and gentle companionship.\", \"voice_text\": \"It must feel quite empty when you're lonely. Please remember, even if there's no one physically with you right now, you're not alone in feeling this way. We're here, and we've prepared some warm music and visuals, hoping to bring you a sense of comfort and companionship.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "今天面试又失败了，好难过，感觉自己什么都做不好。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second empathetic and uplifting instrumental piece. Starts with a slightly melancholic piano, gradually joined by hopeful cello and strings, building gently. Tempo around 65 BPM. Aims to acknowledge sadness but offer solace.\", \"image_prompt\": \"Image of a single resilient flower growing through a crack in a pavement, bathed in soft morning light. Symbolizes hope and strength amidst adversity. Gentle focus, slightly desaturated colors with a warm highlight on the flower.\", \"voice_text\": \"面试失败了，这份失落和难过我们非常理解。请不要因此否定自己，每一次尝试都是宝贵的经验。给自己一点时间调整，我们为你准备了能带来安慰的音乐和画面，希望能陪伴你度过这个低谷，重新找回力量。\"}"
+  },
+  {
+    "instruction": "I failed another job interview today, I'm so sad and feel like I can't do anything right.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second empathetic and uplifting instrumental piece. Starts with a slightly melancholic piano, gradually joined by hopeful cello and strings, building gently. Tempo around 65 BPM. Aims to acknowledge sadness but offer solace.\", \"image_prompt\": \"Image of a single resilient flower growing through a crack in a pavement, bathed in soft morning light. Symbolizes hope and strength amidst adversity. Gentle focus, slightly desaturated colors with a warm highlight on the flower.\", \"voice_text\": \"Failing an interview is disheartening, and we truly understand your sadness and frustration. Please don't let this define your worth; every attempt is a valuable learning experience. Give yourself some time to process. We've prepared some comforting music and visuals, hoping they can accompany you through this low point and help you regain your strength.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我的小猫不见了，我好想它，心里空空的。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second tender and slightly melancholic lullaby played on a music box, with very soft, ethereal string pads in the background. Gentle and soothing, acknowledging loss but offering a warm embrace.\", \"image_prompt\": \"Soft-focus, heartwarming illustration of a sleeping kitten curled up in a cozy blanket, bathed in gentle, warm light. Pastel colors, dreamy atmosphere. Evokes feelings of love, tenderness, and gentle remembrance.\", \"voice_text\": \"听到你的小猫不见了，一定非常难过和担心。失去心爱的宠物就像失去家人一样，那种空落落的感觉我们懂。我们为你准备了温柔的音乐和画面，希望能带给你一些安慰，抚平你此刻的忧伤。\"}"
+  },
+  {
+    "instruction": "My little cat is missing, I miss it so much, my heart feels empty.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second tender and slightly melancholic lullaby played on a music box, with very soft, ethereal string pads in the background. Gentle and soothing, acknowledging loss but offering a warm embrace.\", \"image_prompt\": \"Soft-focus, heartwarming illustration of a sleeping kitten curled up in a cozy blanket, bathed in gentle, warm light. Pastel colors, dreamy atmosphere. Evokes feelings of love, tenderness, and gentle remembrance.\", \"voice_text\": \"Hearing that your little cat is missing must be incredibly sad and worrying. Losing a beloved pet is like losing a family member, and we understand that empty feeling. We've prepared some gentle music and visuals for you, hoping to bring you some comfort and soothe your sorrow.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "感觉没人理解我，我说的话他们都不在乎。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second piece with a lone, soulful clarinet melody accompanied by warm, sustained chords from a string quartet. Slow, expressive, creating a sense of being heard and understood. Tempo around 55 BPM.\", \"image_prompt\": \"Abstract art symbolizing connection and understanding. Two distinct shapes gently touching or overlapping, rendered in harmonious, warm colors (e.g., soft peach and lavender). Diffused light, creating an atmosphere of empathy.\", \"voice_text\": \"感觉不被理解，一定让你觉得很孤单和委屈吧。你的感受很重要，值得被倾听和尊重。我们在这里，愿意听你诉说。现在，请听听我们为你准备的音乐，看看这些画面，希望能让你感觉到被理解和一丝温暖。\"}"
+  },
+  {
+    "instruction": "I feel like no one understands me, they don't care about what I say.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second piece with a lone, soulful clarinet melody accompanied by warm, sustained chords from a string quartet. Slow, expressive, creating a sense of being heard and understood. Tempo around 55 BPM.\", \"image_prompt\": \"Abstract art symbolizing connection and understanding. Two distinct shapes gently touching or overlapping, rendered in harmonious, warm colors (e.g., soft peach and lavender). Diffused light, creating an atmosphere of empathy.\", \"voice_text\": \"Feeling misunderstood must make you feel very lonely and unheard. Your feelings are important and deserve to be listened to and respected. We are here and willing to listen. For now, please listen to the music and look at these visuals we've prepared, hoping they make you feel understood and bring a touch of warmth.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我一个人在国外，特别想家，有点难受。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second heartwarming and slightly nostalgic instrumental piece. Features a gentle piano melody reminiscent of a familiar folk song, with soft strings and a touch of acoustic guitar. Aims to evoke warmth and solace.\", \"image_prompt\": \"A cozy, inviting image of a window looking out onto a peaceful, starlit night, with a warm light glowing from inside the room. Suggests comfort, safety, and a connection to home even when far away. Soft, slightly muted style.\", \"voice_text\": \"一个人在异国他乡，想家是很自然的情感，那种滋味肯定不好受。这份乡愁，我们能体会。我们为你准备了一些能带来温暖和慰藉的音乐与画面，希望能稍微缓解你的思乡之情，让你感觉不那么孤单。\"}"
+  },
+  {
+    "instruction": "I'm abroad alone, I'm really homesick and feeling a bit down.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"comfort\", \"music_prompt\": \"A 30-second heartwarming and slightly nostalgic instrumental piece. Features a gentle piano melody reminiscent of a familiar folk song, with soft strings and a touch of acoustic guitar. Aims to evoke warmth and solace.\", \"image_prompt\": \"A cozy, inviting image of a window looking out onto a peaceful, starlit night, with a warm light glowing from inside the room. Suggests comfort, safety, and a connection to home even when far away. Soft, slightly muted style.\", \"voice_text\": \"Being alone in a foreign country, it's very natural to feel homesick; that feeling must be tough. We understand this longing for home. We've prepared some music and visuals that we hope will bring you warmth and comfort, easing your homesickness a little and making you feel less alone.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "最近什么都不想做，一点动力都没有，怎么才能振作起来？",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second uplifting yet gentle track. Starts with a simple, rhythmic kalimba pattern, gradually adding optimistic flute melodies and light percussion. Moderate slow tempo (70 BPM), builds subtly to inspire without overwhelming.\", \"image_prompt\": \"Abstract image of a small seedling sprouting, with soft rays of light shining down. Colors shifting from cool blues/greys at the bottom to warm yellows/greens at the top. Symbolizes new beginnings and gentle growth.\", \"voice_text\": \"感觉缺乏动力，什么都不想做，这种状态确实让人有些沮丧。没关系，给自己一点时间和空间。小小的改变就能带来不同。我们为你准备了一些轻柔的激励音乐和充满生机的画面，希望能温柔地推动你一下，点燃你心中的小火花。\"}"
+  },
+  {
+    "instruction": "I don't feel like doing anything lately, I have no motivation at all, how can I get going?",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second uplifting yet gentle track. Starts with a simple, rhythmic kalimba pattern, gradually adding optimistic flute melodies and light percussion. Moderate slow tempo (70 BPM), builds subtly to inspire without overwhelming.\", \"image_prompt\": \"Abstract image of a small seedling sprouting, with soft rays of light shining down. Colors shifting from cool blues/greys at the bottom to warm yellows/greens at the top. Symbolizes new beginnings and gentle growth.\", \"voice_text\": \"Feeling unmotivated and not wanting to do anything can be quite frustrating. It's okay, give yourself some time and space. Small changes can make a difference. We've prepared some gentle motivational music and vibrant visuals for you, hoping to give you a soft nudge and ignite that little spark within you.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我觉得自己一无是处，做什么都失败，对自己很失望。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second hopeful and encouraging instrumental piece. Begins with a soft, contemplative piano, joined by a warm cello melody that gradually becomes more assertive and positive. Includes subtle, uplifting chimes. Tempo builds from 60 to 75 BPM.\", \"image_prompt\": \"Artwork depicting a winding path leading towards a softly glowing sunrise over a misty valley. Represents a journey with challenges but ultimately hopeful. Colors are soft pastels with an increasingly warm glow. Encouraging and serene.\", \"voice_text\": \"对自己感到失望，觉得一无是处，这一定让你非常难受。请相信，每个人都有自己的价值和闪光点，一时的挫折不代表全部。我们为你准备了能带来一丝力量的音乐和画面，希望能帮助你看到自己的潜力，温柔地鼓励你继续前行。\"}"
+  },
+  {
+    "instruction": "I feel worthless, I fail at everything, I'm very disappointed in myself.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second hopeful and encouraging instrumental piece. Begins with a soft, contemplative piano, joined by a warm cello melody that gradually becomes more assertive and positive. Includes subtle, uplifting chimes. Tempo builds from 60 to 75 BPM.\", \"image_prompt\": \"Artwork depicting a winding path leading towards a softly glowing sunrise over a misty valley. Represents a journey with challenges but ultimately hopeful. Colors are soft pastels with an increasingly warm glow. Encouraging and serene.\", \"voice_text\": \"Feeling disappointed in yourself and thinking you're worthless must be incredibly painful. Please believe that everyone has their own value and strengths; temporary setbacks don't define you. We've prepared some music and visuals to offer a bit of strength, hoping to help you see your potential and gently encourage you to keep moving forward.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我害怕尝试新事物，怕出糗，怕失败。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second courageous and reassuring track. Features a steady, gentle drumbeat like a supportive heartbeat, with bright, optimistic ukulele chords and a playful, light glockenspiel melody. Encourages taking small steps.\", \"image_prompt\": \"Illustration of a small bird tentatively looking out from its nest, with a bright, inviting sky beyond. Warm, encouraging colors. Style is whimsical and lighthearted, reducing the feeling of pressure. Symbolizes courage for a first step.\", \"voice_text\": \"害怕尝试新事物，担心失败和出糗，这种心情很常见。勇敢不是不害怕，而是带着害怕依然前行。每一步小小的尝试都值得鼓励。我们为你准备了一些轻松愉快的音乐和画面，希望能给你一点勇气，让你愿意迈出第一步。\"}"
+  },
+  {
+    "instruction": "I'm afraid to try new things, scared of making a fool of myself and failing.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second courageous and reassuring track. Features a steady, gentle drumbeat like a supportive heartbeat, with bright, optimistic ukulele chords and a playful, light glockenspiel melody. Encourages taking small steps.\", \"image_prompt\": \"Illustration of a small bird tentatively looking out from its nest, with a bright, inviting sky beyond. Warm, encouraging colors. Style is whimsical and lighthearted, reducing the feeling of pressure. Symbolizes courage for a first step.\", \"voice_text\": \"It's common to be afraid of trying new things, worrying about failure or embarrassment. Courage isn't the absence of fear, but moving forward despite it. Every small attempt is commendable. We've prepared some lighthearted and cheerful music and visuals, hoping to give you a bit of courage to take that first step.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "最近总是拖延，事情堆积如山，不知道从何开始。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second subtly energizing yet calm track. Light, rhythmic pizzicato strings with a clear, simple piano melody that encourages focus and action. Steady, unobtrusive beat. Not too fast, around 80 BPM.\", \"image_prompt\": \"Minimalist design showing a single, clear path forward through a slightly cluttered but manageable space. Soft, encouraging colors like light green and sky blue. Focus on clarity and a sense of 'one step at a time'.\", \"voice_text\": \"事情堆积如山，拖延让你感到不知所措，这很正常。不如先从一件最小的事情开始，完成它，给自己一点小小的成就感。我们为你准备了能帮助集中精神的音乐和简洁的画面，希望能助你打破拖延，一步步来。\"}"
+  },
+  {
+    "instruction": "I've been procrastinating a lot lately, tasks are piling up, and I don't know where to start.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second subtly energizing yet calm track. Light, rhythmic pizzicato strings with a clear, simple piano melody that encourages focus and action. Steady, unobtrusive beat. Not too fast, around 80 BPM.\", \"image_prompt\": \"Minimalist design showing a single, clear path forward through a slightly cluttered but manageable space. Soft, encouraging colors like light green and sky blue. Focus on clarity and a sense of 'one step at a time'.\", \"voice_text\": \"It's normal to feel overwhelmed by procrastination when tasks pile up. How about starting with the smallest thing? Completing it can give you a small sense of achievement. We've prepared some music to help you focus and simple visuals, hoping to assist you in breaking the cycle of procrastination, one step at a time.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我想开始晨跑，但总是起不来，需要一点鼓励。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second bright and optimistic morning-themed track. Acoustic guitar, light, crisp percussion, and an uplifting melody played by a recorder or whistle. Tempo around 110 BPM, energetic but not aggressive. Sounds of birds chirping softly.\", \"image_prompt\": \"Vibrant illustration of a sunrise over a park running trail. Dewy grass, fresh air, warm sunlight filtering through trees. Colors are bright and energizing (yellows, oranges, fresh greens). Inspires a fresh start to the day.\", \"voice_text\": \"想要晨跑却总是起不来，这份挣扎我们了解。想象一下晨跑后神清气爽的感觉！别给自己太大压力，哪怕只是早起散散步也是好的开始。我们为你准备了充满活力的音乐和晨曦的画面，希望能激励你穿上跑鞋，迎接新的一天！\"}"
+  },
+  {
+    "instruction": "I want to start morning runs, but I always struggle to get up. I need some encouragement.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"gentle_motivation\", \"music_prompt\": \"A 30-second bright and optimistic morning-themed track. Acoustic guitar, light, crisp percussion, and an uplifting melody played by a recorder or whistle. Tempo around 110 BPM, energetic but not aggressive. Sounds of birds chirping softly.\", \"image_prompt\": \"Vibrant illustration of a sunrise over a park running trail. Dewy grass, fresh air, warm sunlight filtering through trees. Colors are bright and energizing (yellows, oranges, fresh greens). Inspires a fresh start to the day.\", \"voice_text\": \"We understand that struggle of wanting to start morning runs but finding it hard to get up. Imagine how refreshed you'll feel afterwards! Don't put too much pressure on yourself; even just an early walk is a great start. We've prepared some energetic music and sunrise visuals, hoping to inspire you to put on your running shoes and embrace the new day!\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "今天天气真好，莫名就很开心！想来点快乐的音乐。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second cheerful and upbeat ukulele instrumental with a light, bouncy rhythm, happy whistling melody, and subtle hand claps. Sunny and carefree, around 120 BPM. Purely instrumental and joyful.\", \"image_prompt\": \"Bright, vibrant abstract art with playful shapes and warm, sunny colors like yellow, orange, and light blue. A feeling of movement and lightheartedness. Perhaps like confetti or bubbles. Radiates pure, simple joy.\", \"voice_text\": \"天气好，心情也跟着阳光起来，真棒！这种纯粹的快乐非常珍贵。我们为你准备了充满喜悦的音乐和明媚的画面，希望能让你的好心情更添色彩，尽情享受这份美好吧！\"}"
+  },
+  {
+    "instruction": "The weather is great today, and I'm inexplicably happy! I'd like some joyful music.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second cheerful and upbeat ukulele instrumental with a light, bouncy rhythm, happy whistling melody, and subtle hand claps. Sunny and carefree, around 120 BPM. Purely instrumental and joyful.\", \"image_prompt\": \"Bright, vibrant abstract art with playful shapes and warm, sunny colors like yellow, orange, and light blue. A feeling of movement and lightheartedness. Perhaps like confetti or bubbles. Radiates pure, simple joy.\", \"voice_text\": \"It's wonderful when good weather lifts your spirits like that! That pure, simple joy is so precious. We've prepared some delightful music and bright visuals for you, hoping to add even more color to your good mood. Enjoy this beautiful feeling!\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我完成了一个很重要的项目，感觉好轻松，好开心！",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second celebratory and uplifting piece with a bright piano melody, light orchestral swells, and joyful, rhythmic percussion. Conveys a sense of accomplishment and happiness. Tempo around 115 BPM.\", \"image_prompt\": \"Abstract image representing achievement and celebration. Dynamic, upward-flowing lines and shapes in vibrant colors like gold, bright blue, and magenta. A sense of energy and bursting joy. Festive and light.\", \"voice_text\": \"恭喜你完成重要项目！那种如释重负的轻松和油然而生的喜悦，一定非常美妙。这是你努力应得的回报！我们为你准备了庆祝的音乐和充满喜悦的画面，与你一同分享这份成就感，好好享受这份快乐吧！\"}"
+  },
+  {
+    "instruction": "I just completed a very important project, I feel so relieved and happy!",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second celebratory and uplifting piece with a bright piano melody, light orchestral swells, and joyful, rhythmic percussion. Conveys a sense of accomplishment and happiness. Tempo around 115 BPM.\", \"image_prompt\": \"Abstract image representing achievement and celebration. Dynamic, upward-flowing lines and shapes in vibrant colors like gold, bright blue, and magenta. A sense of energy and bursting joy. Festive and light.\", \"voice_text\": \"Congratulations on completing your important project! That feeling of relief and happiness must be wonderful. It's a well-deserved reward for your hard work! We've prepared some celebratory music and joyful visuals to share in your sense of accomplishment. Enjoy this happy moment!\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "想找点能让我心情愉悦，充满活力的东西。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second lively and playful track with a catchy glockenspiel melody, upbeat pizzicato strings, and light, energetic percussion. Evokes feelings of fun, brightness, and positive energy. Around 125 BPM.\", \"image_prompt\": \"Colorful abstract geometric pattern in motion. Bright primary and secondary colors, clean lines, and a sense of dynamic, happy movement. Playful and modern design that sparks joy and energy.\", \"voice_text\": \"想要一些能让心情愉悦、充满活力的东西，这个想法很棒！主动追寻快乐是很积极的生活态度。我们为你精心挑选了能点亮心情的音乐和画面，希望能给你带来满满的元气和笑容。\"}"
+  },
+  {
+    "instruction": "I'm looking for something to lift my spirits and make me feel energetic.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second lively and playful track with a catchy glockenspiel melody, upbeat pizzicato strings, and light, energetic percussion. Evokes feelings of fun, brightness, and positive energy. Around 125 BPM.\", \"image_prompt\": \"Colorful abstract geometric pattern in motion. Bright primary and secondary colors, clean lines, and a sense of dynamic, happy movement. Playful and modern design that sparks joy and energy.\", \"voice_text\": \"That's a great idea to look for something uplifting and energizing! Actively seeking joy is a very positive approach to life. We've carefully selected some music and visuals designed to brighten your mood, hoping to fill you with energy and smiles.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "今天是我生日，想听点开心的音乐庆祝一下！",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second upbeat and festive instrumental, featuring bright brass fanfares, playful woodwind melodies, and a joyful, driving rhythm section. Perfect for a happy celebration. Tempo 130 BPM.\", \"image_prompt\": \"Vibrant and celebratory image with abstract fireworks or confetti in bright, sparkling colors (gold, silver, pink, blue) against a festive background. Conveys excitement and happiness. Modern and cheerful design.\", \"voice_text\": \"生日快乐！在这个特别的日子里，愿你被满满的幸福和喜悦包围。我们为你准备了充满节日气氛的音乐和绚烂的画面，希望能为你的生日增添更多欢乐，祝你度过美好的一天！\"}"
+  },
+  {
+    "instruction": "It's my birthday today, I want to listen to some happy music to celebrate!",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second upbeat and festive instrumental, featuring bright brass fanfares, playful woodwind melodies, and a joyful, driving rhythm section. Perfect for a happy celebration. Tempo 130 BPM.\", \"image_prompt\": \"Vibrant and celebratory image with abstract fireworks or confetti in bright, sparkling colors (gold, silver, pink, blue) against a festive background. Conveys excitement and happiness. Modern and cheerful design.\", \"voice_text\": \"Happy Birthday! On this special day, may you be surrounded by happiness and joy. We've prepared some festive music and dazzling visuals for you, hoping to add more cheer to your birthday. Have a wonderful day!\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "和小伙伴们玩得很开心，现在心情特别好！",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second lighthearted and bubbly synth-pop instrumental with a catchy, simple melody and a fun, danceable beat. Evokes friendship, fun, and carefree moments. Tempo around 120 BPM.\", \"image_prompt\": \"Abstract representation of joyful connection. Intertwined, colorful flowing lines or friendly, animated shapes dancing together. Bright, warm colors. Expresses the happiness of shared good times.\", \"voice_text\": \"和朋友们玩得开心，这种快乐真是太棒了！友谊和美好的相聚时光总是能让人心情愉悦。我们为你准备了欢快的音乐和充满活力的画面，希望能延续你的这份好心情，让你再次回味那份快乐。\"}"
+  },
+  {
+    "instruction": "I had a lot of fun with my friends, I'm in a really good mood now!",
+    "input": "",
+    "output": "{\"emotion_tag\": \"joyfulness\", \"music_prompt\": \"A 30-second lighthearted and bubbly synth-pop instrumental with a catchy, simple melody and a fun, danceable beat. Evokes friendship, fun, and carefree moments. Tempo around 120 BPM.\", \"image_prompt\": \"Abstract representation of joyful connection. Intertwined, colorful flowing lines or friendly, animated shapes dancing together. Bright, warm colors. Expresses the happiness of shared good times.\", \"voice_text\": \"It's fantastic that you had such a good time with your friends! Friendship and wonderful shared moments always bring such joy. We've prepared some cheerful music and vibrant visuals for you, hoping to prolong your good mood and let you savor that happiness again.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我需要集中注意力完成一项工作，有没有合适的背景音乐？",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second minimalist electronic ambient track designed for deep focus. Steady, subtle pulse (around 70 BPM), with evolving, non-distracting synth pads and occasional soft bell tones. No strong melodies. Alpha wave entrainment focus.\", \"image_prompt\": \"Minimalist geometric abstract art. Clean lines, balanced composition, and a calm, neutral color palette (e.g., greys, soft blues, a touch of muted gold). Creates a sense of order, clarity, and uncluttered mental space.\", \"voice_text\": \"需要集中注意力来完成工作，这很棒，专注能带来高效。我们为你准备了能帮助你进入心流状态的音乐和简洁的画面，希望能为你创造一个不受打扰的环境，助你顺利完成任务。\"}"
+  },
+  {
+    "instruction": "I need to concentrate on a task, is there any suitable background music?",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second minimalist electronic ambient track designed for deep focus. Steady, subtle pulse (around 70 BPM), with evolving, non-distracting synth pads and occasional soft bell tones. No strong melodies. Alpha wave entrainment focus.\", \"image_prompt\": \"Minimalist geometric abstract art. Clean lines, balanced composition, and a calm, neutral color palette (e.g., greys, soft blues, a touch of muted gold). Creates a sense of order, clarity, and uncluttered mental space.\", \"voice_text\": \"It's great that you want to focus on your work; concentration leads to efficiency. We've prepared some music designed to help you get into a flow state and simple visuals, hoping to create an undisturbed environment for you to complete your task successfully.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "思绪很乱，想找点东西帮我理清思路，安静思考一下。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second contemplative solo piano piece. Slow, deliberate tempo (around 55 BPM), with clear, resonant notes and spacious phrasing. Minimalist, allowing room for thought and introspection. Major key but thoughtful.\", \"image_prompt\": \"Abstract image of a clear, still body of water reflecting a calm sky. Symmetrical, peaceful. Cool, calming colors like deep blue and soft grey. Represents mental clarity and undisturbed thought. Serene landscape illustration style.\", \"voice_text\": \"当思绪混乱的时候，找个安静的时刻整理一下确实很有帮助。别急，慢慢来。我们为你准备了能引导你深度思考的音乐和宁静的画面，希望能帮助你的头脑逐渐清晰，找到内心的秩序。\"}"
+  },
+  {
+    "instruction": "My thoughts are all jumbled, I want something to help me clear my head and think quietly.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second contemplative solo piano piece. Slow, deliberate tempo (around 55 BPM), with clear, resonant notes and spacious phrasing. Minimalist, allowing room for thought and introspection. Major key but thoughtful.\", \"image_prompt\": \"Abstract image of a clear, still body of water reflecting a calm sky. Symmetrical, peaceful. Cool, calming colors like deep blue and soft grey. Represents mental clarity and undisturbed thought. Serene landscape illustration style.\", \"voice_text\": \"When your thoughts are jumbled, taking a quiet moment to sort them out is indeed very helpful. Don't rush, take your time. We've prepared some music to guide you into deep thought and tranquil visuals, hoping to help your mind gradually become clearer and find inner order.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "要准备一个重要的演讲，我需要高度专注来构思内容。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second instrumental track blending classical guitar with subtle ambient textures. Steady rhythm, clear melodic lines that are engaging but not distracting. Designed to enhance concentration for creative tasks. Tempo 75 BPM.\", \"image_prompt\": \"Stylized image of a well-organized, minimalist workspace or library. Orderly, with good lighting. Focus on elements that inspire intellect and clarity, like books or clean architectural lines. Muted, sophisticated color palette.\", \"voice_text\": \"准备重要演讲需要高度专注，构思好内容是成功的一半。我们理解这份对质量的追求。这里有为你准备的能提升专注力的音乐和激发灵感的画面，希望能助你文思泉涌，顺利完成演讲稿。\"}"
+  },
+  {
+    "instruction": "I need to prepare for an important speech and require high concentration to brainstorm content.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second instrumental track blending classical guitar with subtle ambient textures. Steady rhythm, clear melodic lines that are engaging but not distracting. Designed to enhance concentration for creative tasks. Tempo 75 BPM.\", \"image_prompt\": \"Stylized image of a well-organized, minimalist workspace or library. Orderly, with good lighting. Focus on elements that inspire intellect and clarity, like books or clean architectural lines. Muted, sophisticated color palette.\", \"voice_text\": \"Preparing an important speech requires intense focus, and crafting great content is half the battle. We understand this dedication to quality. Here's some music to enhance concentration and inspiring visuals, hoping to help your ideas flow and complete your speech smoothly.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我正在学习一门新技能，感觉有点吃力，希望能更专注一些。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second binaural beats track (beta waves for focus) subtly embedded in a calming, atmospheric soundscape with no distinct melody. Consistent, low-volume background sound, like distant flowing water or soft white noise.\", \"image_prompt\": \"Abstract digital art representing the process of learning and neural connections forming. Glowing lines and nodes on a dark, calm background. Suggests mental activity and knowledge acquisition. Cool colors with highlights.\", \"voice_text\": \"学习新技能遇到困难是很正常的，保持专注确实能让学习更有效率。不要灰心，每一点进步都算数。我们为你准备了能帮助你集中精神学习的音乐和画面，希望能让你在学习过程中更投入，更有收获。\"}"
+  },
+  {
+    "instruction": "I'm learning a new skill and it feels a bit difficult, I hope to be more focused.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second binaural beats track (beta waves for focus) subtly embedded in a calming, atmospheric soundscape with no distinct melody. Consistent, low-volume background sound, like distant flowing water or soft white noise.\", \"image_prompt\": \"Abstract digital art representing the process of learning and neural connections forming. Glowing lines and nodes on a dark, calm background. Suggests mental activity and knowledge acquisition. Cool colors with highlights.\", \"voice_text\": \"It's perfectly normal to find learning a new skill challenging; staying focused can indeed make learning more effective. Don't be discouraged, every bit of progress counts. We've prepared some music and visuals to help you concentrate on your studies, hoping you can be more engaged and gain more from the process.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我想静下心来读会儿书，但周围有点吵。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second instrumental piece featuring a solo cello playing a calm, flowing melody, accompanied by very subtle, ambient nature sounds (e.g., rustling leaves). Designed to create a peaceful reading bubble. Slow tempo, around 60 BPM.\", \"image_prompt\": \"Image of a cozy reading nook, perhaps by a window with soft light. Bookshelves, a comfortable chair. Warm, inviting atmosphere that encourages quiet contemplation and absorption in a book. Serene still life.\", \"voice_text\": \"想静心阅读却被噪音打扰，确实很影响体验。戴上耳机，让我们的音乐为你隔绝干扰。我们为你准备了适合阅读的宁静音乐和舒适的画面，希望能帮你营造一个专注的阅读空间，沉浸在书的世界里。\"}"
+  },
+  {
+    "instruction": "I want to settle down and read a book, but it's a bit noisy around.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"focus\", \"music_prompt\": \"A 30-second instrumental piece featuring a solo cello playing a calm, flowing melody, accompanied by very subtle, ambient nature sounds (e.g., rustling leaves). Designed to create a peaceful reading bubble. Slow tempo, around 60 BPM.\", \"image_prompt\": \"Image of a cozy reading nook, perhaps by a window with soft light. Bookshelves, a comfortable chair. Warm, inviting atmosphere that encourages quiet contemplation and absorption in a book. Serene still life.\", \"voice_text\": \"It's definitely disruptive when you want to read peacefully but there's noise around. Put on your headphones and let our music shield you from distractions. We've prepared some tranquil music perfect for reading and cozy visuals, hoping to help you create a focused reading space and immerse yourself in the world of your book.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "心里堵得慌，有好多情绪积压着，想释放一下。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second expressive instrumental piece that starts with tense, rhythmic strings and gradually builds to a cathartic release with powerful (but not aggressive) percussion and soaring melodies, then fades to calm. Dynamic tempo.\", \"image_prompt\": \"Abstract dynamic art depicting an explosion of colors (e.g. deep blues and purples releasing into lighter, brighter hues) or energy, like a wave crashing and then receding. Symbolizes emotional release and subsequent peace. Powerful yet beautiful.\", \"voice_text\": \"感觉到你心里积压了很多情绪，一定很难受吧。把这些情绪释放出来是很重要的一步。别怕，让它们流淌出来。我们为你准备了能帮助你宣泄情感的音乐和画面，希望能给你一个安全的空间，让心情得到释放和平复。\"}"
+  },
+  {
+    "instruction": "I feel a tightness in my chest, lots of pent-up emotions, I want to release them.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second expressive instrumental piece that starts with tense, rhythmic strings and gradually builds to a cathartic release with powerful (but not aggressive) percussion and soaring melodies, then fades to calm. Dynamic tempo.\", \"image_prompt\": \"Abstract dynamic art depicting an explosion of colors (e.g. deep blues and purples releasing into lighter, brighter hues) or energy, like a wave crashing and then receding. Symbolizes emotional release and subsequent peace. Powerful yet beautiful.\", \"voice_text\": \"It must be very uncomfortable to feel that tightness from pent-up emotions. Releasing them is an important step. Don't be afraid, let them flow. We've prepared some music and visuals designed to help you express these feelings, hoping to provide a safe space for you to find release and then calm.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "今天压力山大，感觉快要扛不住了。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second track with a strong, grounding beat (like a djembe drum) combined with flowing, ethereal synth pads. Creates a sense of releasing tension into the earth. Tempo moderate, 80 BPM, with a feeling of letting go.\", \"image_prompt\": \"Image of a powerful waterfall cascading down rocks into a calm pool below. Represents the overwhelming force of stress being released and transforming into tranquility. Dynamic nature photography or realistic illustration.\", \"voice_text\": \"“压力山大”的感觉，我们都懂，像是背负了重担。你需要一个释放的出口。请允许自己暂时卸下这些重担。我们为你准备了能帮助你释放压力的音乐和画面，希望能让你紧绷的神经得到舒缓，重获轻松。\"}"
+  },
+  {
+    "instruction": "The stress today is immense, I feel like I can barely handle it.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second track with a strong, grounding beat (like a djembe drum) combined with flowing, ethereal synth pads. Creates a sense of releasing tension into the earth. Tempo moderate, 80 BPM, with a feeling of letting go.\", \"image_prompt\": \"Image of a powerful waterfall cascading down rocks into a calm pool below. Represents the overwhelming force of stress being released and transforming into tranquility. Dynamic nature photography or realistic illustration.\", \"voice_text\": \"We all understand that feeling of immense stress, like carrying a heavy burden. You need an outlet. Allow yourself to set down these burdens for a moment. We've prepared some music and visuals to help you release this stress, hoping to soothe your tense nerves and help you feel lighter.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我好生气，但是不知道怎么发泄出来才是对的。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second piece featuring powerful, rhythmic drumming (e.g., taiko drums) with a raw, emotive wind instrument melody (like a shakuhachi flute). Controlled power, not chaotic. Allows for expressing anger constructively before finding calm.\", \"image_prompt\": \"Abstract image of a controlled volcanic eruption, where the lava flows in designated paths, or a stormy sea with waves crashing but eventually calming. Darker, intense colors giving way to cooler, calmer ones. Symbolizes managed release of strong emotion.\", \"voice_text\": \"感到生气是很正常的情绪，重要的是找到健康的方式来疏导它，而不是压抑或伤害自己和他人。我们为你准备了能帮助你安全释放怒气的音乐和画面，让这股能量得到转化，之后你会感觉好一些。\"}"
+  },
+  {
+    "instruction": "I'm so angry, but I don't know the right way to vent it.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second piece featuring powerful, rhythmic drumming (e.g., taiko drums) with a raw, emotive wind instrument melody (like a shakuhachi flute). Controlled power, not chaotic. Allows for expressing anger constructively before finding calm.\", \"image_prompt\": \"Abstract image of a controlled volcanic eruption, where the lava flows in designated paths, or a stormy sea with waves crashing but eventually calming. Darker, intense colors giving way to cooler, calmer ones. Symbolizes managed release of strong emotion.\", \"voice_text\": \"Feeling angry is a normal emotion. The important thing is to find a healthy way to channel it, rather than suppressing it or hurting yourself or others. We've prepared some music and visuals to help you safely release that anger, allowing that energy to transform. You'll feel better afterwards.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "最近发生了太多不开心的事，我只想大哭一场。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second deeply emotive solo cello piece, slow and poignant, allowing space for tears and emotional processing, gradually leading to a sense of quiet acceptance. Minor key, very expressive.\", \"image_prompt\": \"Image of rain falling against a windowpane, with a soft, blurred background. Melancholy but also cleansing and renewing. Cool, muted color palette. Creates a safe, private space for emotional release.\", \"voice_text\": \"有太多不开心的事堆积在一起，想哭就哭出来吧，眼泪是情绪的出口，也是一种疗愈。不要憋着，我们在这里陪着你。我们为你准备了能让你安心释放悲伤的音乐和画面，哭过之后，希望你能感觉轻松一些。\"}"
+  },
+  {
+    "instruction": "Too many unhappy things have happened recently, I just want to cry my eyes out.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second deeply emotive solo cello piece, slow and poignant, allowing space for tears and emotional processing, gradually leading to a sense of quiet acceptance. Minor key, very expressive.\", \"image_prompt\": \"Image of rain falling against a windowpane, with a soft, blurred background. Melancholy but also cleansing and renewing. Cool, muted color palette. Creates a safe, private space for emotional release.\", \"voice_text\": \"When too many unhappy things pile up, it's okay to cry. Tears are an emotional outlet and a form of healing. Don't hold back; we're here with you. We've prepared some music and visuals that allow you to safely release your sadness. After you cry, we hope you'll feel a bit lighter.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我感觉身体里充满了紧张感，肌肉都是紧绷的，怎么放松啊？",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second progressive relaxation ambient track. Starts with a slightly tense drone, gradually unwinding with descending melodies and softening textures, like a muscle slowly unclenching. Includes gentle ocean wave sounds.\", \"image_prompt\": \"Abstract animation or image of tightly wound threads慢慢松开， or a tense, dark color slowly transitioning to a soft, light, and expansive one. Symbolizes physical tension dissolving. Gentle, flowing visuals.\", \"voice_text\": \"身体充满紧张感，肌肉紧绷一定很不舒服。有意识地去感受并释放这份紧张是很重要。现在，请跟着我们的引导，深呼吸，想象紧张感一点点从你身体里流走。我们准备了舒缓的音乐和放松的画面，帮助你彻底放松下来。\"}"
+  },
+  {
+    "instruction": "I feel full of tension in my body, my muscles are all tight, how can I relax?",
+    "input": "",
+    "output": "{\"emotion_tag\": \"release\", \"music_prompt\": \"A 30-second progressive relaxation ambient track. Starts with a slightly tense drone, gradually unwinding with descending melodies and softening textures, like a muscle slowly unclenching. Includes gentle ocean wave sounds.\", \"image_prompt\": \"Abstract animation or image of tightly wound threads slowly unwinding, or a tense, dark color slowly transitioning to a soft, light, and expansive one. Symbolizes physical tension dissolving. Gentle, flowing visuals.\", \"voice_text\": \"It must be very uncomfortable to feel so much tension and tightness in your body. Consciously feeling and releasing this tension is important. Now, please follow our guidance, take deep breaths, and imagine the tension slowly flowing out of your body. We've prepared soothing music and relaxing visuals to help you fully unwind.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "有点不开心，想听点忧伤但又唯美的音乐，沉淀一下心情。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second beautifully melancholic solo piano piece. Slow tempo (around 50 BPM), poignant melody in a minor key with rich harmonies. Evokes gentle sadness, nostalgia, and introspection, but with an underlying sense of peace.\", \"image_prompt\": \"Aesthetically pleasing image of a single autumn leaf falling gently onto still water, with soft, diffused light. Muted, warm autumnal colors. Reflective and serene, capturing a beautiful, fleeting moment of sadness.\", \"voice_text\": \"感觉到你有些不开心，想在忧伤的氛围里沉淀一下心情，这是一种很细腻的情感需求。有时候，温柔的忧伤能带来独特的慰藉。我们为你准备了这样一段音乐和画面，希望能陪伴你度过这段安静的时光，找到内心的平静。\"}"
+  },
+  {
+    "instruction": "I'm a bit unhappy, I want to listen to some sad but beautiful music to settle my mood.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second beautifully melancholic solo piano piece. Slow tempo (around 50 BPM), poignant melody in a minor key with rich harmonies. Evokes gentle sadness, nostalgia, and introspection, but with an underlying sense of peace.\", \"image_prompt\": \"Aesthetically pleasing image of a single autumn leaf falling gently onto still water, with soft, diffused light. Muted, warm autumnal colors. Reflective and serene, capturing a beautiful, fleeting moment of sadness.\", \"voice_text\": \"I sense you're a bit unhappy and wish to settle your mood with something melancholic yet beautiful; this is a very nuanced emotional need. Sometimes, gentle melancholy can bring a unique kind of comfort. We've prepared such music and visuals for you, hoping to accompany you through this quiet time and help you find inner peace.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "秋天到了，看着落叶，总会有点莫名的伤感。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second wistful piece for string quartet and oboe. Slow, lyrical melodies that evoke nostalgia and the gentle sadness of autumn. Rich, warm textures. Provides a comforting space for reflective sadness.\", \"image_prompt\": \"Impressionistic painting of an autumn park scene. Golden leaves on trees and ground, soft sunlight filtering through. A lone figure walking contemplatively. Warm, rich colors, slightly hazy. Evokes nostalgia and peaceful melancholy.\", \"voice_text\": \"秋天的落叶确实容易勾起一些莫名的伤感，这种淡淡的忧愁也是一种独特的美。不必抗拒它，感受这份季节带来的情绪。我们为你准备了能映衬这份心情的音乐和画面，愿你能在这份忧伤中感受到一丝诗意和宁静。\"}"
+  },
+  {
+    "instruction": "Autumn is here, and seeing the falling leaves always makes me feel a bit inexplicably sad.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second wistful piece for string quartet and oboe. Slow, lyrical melodies that evoke nostalgia and the gentle sadness of autumn. Rich, warm textures. Provides a comforting space for reflective sadness.\", \"image_prompt\": \"Impressionistic painting of an autumn park scene. Golden leaves on trees and ground, soft sunlight filtering through. A lone figure walking contemplatively. Warm, rich colors, slightly hazy. Evokes nostalgia and peaceful melancholy.\", \"voice_text\": \"Falling leaves in autumn can indeed evoke a sense of inexplicable sadness; this gentle sorrow also has its own unique beauty. Don't resist it; feel the emotions this season brings. We've prepared music and visuals that resonate with this mood, hoping you can find a touch of poetry and tranquility within this melancholy.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "想回忆一些过去的事情，心情有点复杂， bittersweet。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second nostalgic instrumental with a delicate music box melody combined with sustained, emotive cello lines. Evokes bittersweet memories, a blend of gentle sadness and warmth. Slow and reflective.\", \"image_prompt\": \"Sepia-toned or soft-focus vintage style image. Could be an old, empty swing set in a park, or a dusty attic with rays of light. Suggests looking back at the past with mixed emotions. Evocative and gentle.\", \"voice_text\": \"回忆往事，心情复杂，既有甜蜜也有苦涩，这很正常。生活本就是五味杂陈的。我们为你准备了能陪伴你回顾过往的音乐和画面，希望能帮助你温柔地梳理这些情感，从中汲取力量或得到释怀。\"}"
+  },
+  {
+    "instruction": "I want to reminisce about some past events, my feelings are a bit complex, bittersweet.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second nostalgic instrumental with a delicate music box melody combined with sustained, emotive cello lines. Evokes bittersweet memories, a blend of gentle sadness and warmth. Slow and reflective.\", \"image_prompt\": \"Sepia-toned or soft-focus vintage style image. Could be an old, empty swing set in a park, or a dusty attic with rays of light. Suggests looking back at the past with mixed emotions. Evocative and gentle.\", \"voice_text\": \"Reminiscing about the past often brings complex, bittersweet feelings; that's perfectly normal, as life is a mix of flavors. We've prepared some music and visuals to accompany your reflections, hoping to help you gently process these emotions and draw strength or find closure from them.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "有时候会突然觉得很难过，但又说不清为什么。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second atmospheric ambient piece with a questioning, slightly melancholic synth melody that drifts in and out. Hazy, ethereal textures with occasional soft piano chords. Creates space for undefined sadness to exist and be explored gently.\", \"image_prompt\": \"Abstract image with blurred, soft shapes and muted colors, like looking through a misty window. Suggests vague, undefined emotions. No clear subject, allowing for personal interpretation. Gentle and non-intrusive.\", \"voice_text\": \"有时候，突如其来的难过，没有明确的理由，这本身就是一种需要被理解的情绪。允许自己感受它，不必急着分析。我们为你准备了能容纳这份模糊哀愁的音乐和画面，希望能给你一个温柔的陪伴，让情绪自然流淌。\"}"
+  },
+  {
+    "instruction": "Sometimes I suddenly feel very sad, but I can't quite explain why.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second atmospheric ambient piece with a questioning, slightly melancholic synth melody that drifts in and out. Hazy, ethereal textures with occasional soft piano chords. Creates space for undefined sadness to exist and be explored gently.\", \"image_prompt\": \"Abstract image with blurred, soft shapes and muted colors, like looking through a misty window. Suggests vague, undefined emotions. No clear subject, allowing for personal interpretation. Gentle and non-intrusive.\", \"voice_text\": \"Sometimes, sudden sadness without a clear reason is an emotion that needs to be understood in itself. Allow yourself to feel it without rushing to analyze. We've prepared music and visuals that can hold this vague sorrow, hoping to offer gentle companionship and let your emotions flow naturally.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我喜欢在雨天听一些安静的、带点忧郁的歌。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second lo-fi chillhop beat with a melancholic electric piano melody, accompanied by the sound of gentle rain and soft vinyl crackle. Relaxing, introspective, and slightly blue, perfect for a rainy day mood.\", \"image_prompt\": \"Cozy illustration of a window with raindrops streaming down, looking out onto a muted, rainy cityscape or garden. Soft, warm interior lighting. Creates a sense of comfort within a melancholic atmosphere. 'Rainy day aesthetic'.\", \"voice_text\": \"雨天确实很适合听一些安静又带点忧郁的歌，那种氛围能让人沉静下来，好好感受自己的内心。我们为你挑选了符合这种心境的音乐和画面，希望能陪伴你度过一个宁静舒适的雨天时光。\"}"
+  },
+  {
+    "instruction": "I like listening to quiet, slightly melancholic songs on rainy days.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"melancholy\", \"music_prompt\": \"A 30-second lo-fi chillhop beat with a melancholic electric piano melody, accompanied by the sound of gentle rain and soft vinyl crackle. Relaxing, introspective, and slightly blue, perfect for a rainy day mood.\", \"image_prompt\": \"Cozy illustration of a window with raindrops streaming down, looking out onto a muted, rainy cityscape or garden. Soft, warm interior lighting. Creates a sense of comfort within a melancholic atmosphere. 'Rainy day aesthetic'.\", \"voice_text\": \"Rainy days are indeed perfect for listening to quiet, slightly melancholic songs; that atmosphere can help one settle down and connect with their inner feelings. We've selected music and visuals that match this mood, hoping to accompany you through a peaceful and cozy rainy day.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "对未来感到迷茫，但还是想抱有一点希望。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second gentle, uplifting track. Starts with a soft, searching piano melody, gradually joined by hopeful string swells and a subtle, optimistic chime. Builds slowly from uncertainty to quiet hope. Tempo around 65 BPM.\", \"image_prompt\": \"Image of a sunrise partially obscured by clouds, with rays of light breaking through. Symbolizes hope emerging from uncertainty. Soft, ethereal style with a palette of pale yellows, pinks, and blues.\", \"voice_text\": \"对未来感到迷茫是很常见的，尤其在变化的时候。但即使在迷雾中，心中那份对希望的向往也非常可贵。请相信，总有光会照进来。我们为你准备了能带来希望感的音乐和画面，希望能给你一点温暖和前行的勇气。\"}"
+  },
+  {
+    "instruction": "I feel lost about the future, but I still want to hold onto some hope.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second gentle, uplifting track. Starts with a soft, searching piano melody, gradually joined by hopeful string swells and a subtle, optimistic chime. Builds slowly from uncertainty to quiet hope. Tempo around 65 BPM.\", \"image_prompt\": \"Image of a sunrise partially obscured by clouds, with rays of light breaking through. Symbolizes hope emerging from uncertainty. Soft, ethereal style with a palette of pale yellows, pinks, and blues.\", \"voice_text\": \"Feeling lost about the future is common, especially during times of change. But even in the mist, that desire for hope in your heart is very precious. Please believe that light will always find its way. We've prepared some music and visuals to inspire hope, aiming to bring you some warmth and courage to move forward.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "经历了一些挫折，但我相信明天会更好。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second inspiring and resilient instrumental piece. Features a determined piano melody that grows in strength, supported by uplifting orchestral elements. Conveys overcoming adversity and looking towards a brighter future. Tempo 70-80 BPM.\", \"image_prompt\": \"Illustration of a small plant pushing through dry, cracked earth towards the sun. Strong symbolism of resilience and new growth. Warm, hopeful lighting. Focus on the contrast between hardship and emerging life.\", \"voice_text\": \"经历挫折后依然相信明天会更好，这份信念非常强大和了不起！正是这份希望，能引领我们走出困境。我们为你准备了充满希望的音乐和画面，为你加油打气，愿你带着这份美好的信念，迎接每一个新的开始。\"}"
+  },
+  {
+    "instruction": "I've experienced some setbacks, but I believe tomorrow will be better.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second inspiring and resilient instrumental piece. Features a determined piano melody that grows in strength, supported by uplifting orchestral elements. Conveys overcoming adversity and looking towards a brighter future. Tempo 70-80 BPM.\", \"image_prompt\": \"Illustration of a small plant pushing through dry, cracked earth towards the sun. Strong symbolism of resilience and new growth. Warm, hopeful lighting. Focus on the contrast between hardship and emerging life.\", \"voice_text\": \"Believing that tomorrow will be better even after setbacks is an incredibly strong and admirable conviction! It's this very hope that guides us out of difficulties. We've prepared some hopeful music and visuals to cheer you on. May you carry this beautiful belief into every new beginning.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我需要一些积极的能量，让我对生活重拾信心。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second bright and optimistic track with a gentle, flowing string melody and sparkling harp arpeggios. Light, airy percussion. Creates a feeling of renewal and positive expectation. Tempo around 100 BPM.\", \"image_prompt\": \"Abstract art with soft, upward-flowing lines and shapes in bright, optimistic colors like sunny yellow, spring green, and sky blue. A sense of lightness, growth, and dawning possibilities. Clean and inspiring.\", \"voice_text\": \"想要汲取积极能量，重拾对生活的信心，这个意愿本身就充满了力量。生活总有起落，重要的是我们如何看待。我们为你准备了能注入希望和活力的音乐与画面，希望能帮助你点亮内心的光芒，再次拥抱生活的美好。\"}"
+  },
+  {
+    "instruction": "I need some positive energy to regain faith in life.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second bright and optimistic track with a gentle, flowing string melody and sparkling harp arpeggios. Light, airy percussion. Creates a feeling of renewal and positive expectation. Tempo around 100 BPM.\", \"image_prompt\": \"Abstract art with soft, upward-flowing lines and shapes in bright, optimistic colors like sunny yellow, spring green, and sky blue. A sense of lightness, growth, and dawning possibilities. Clean and inspiring.\", \"voice_text\": \"Wanting to draw in positive energy and regain faith in life is a powerful intention in itself. Life has its ups and downs; what matters is our perspective. We've prepared music and visuals to instill hope and vitality, hoping to help you illuminate your inner light and embrace the beauty of life once more.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "虽然现在很难，但我知道一切都会好起来的。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second warm and reassuring instrumental featuring a gentle acoustic guitar melody that builds with supportive string harmonies. Evokes a sense of enduring hope and the promise of better times. Comforting and optimistic.\", \"image_prompt\": \"Image of a dark, stormy sky gradually clearing to reveal a rainbow and sunshine. Represents passing hardship and the arrival of hope and peace. Dramatic yet ultimately positive and beautiful.\", \"voice_text\": \"即使现在很难，你依然坚信一切都会好起来，这份内心的笃定和希望非常宝贵。请一定抱持住这份信念。我们为你准备了能传递温暖和希望的音乐与画面，陪伴你度过这段时期，一起期待雨过天晴。\"}"
+  },
+  {
+    "instruction": "Even though it's hard right now, I know everything will be okay.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second warm and reassuring instrumental featuring a gentle acoustic guitar melody that builds with supportive string harmonies. Evokes a sense of enduring hope and the promise of better times. Comforting and optimistic.\", \"image_prompt\": \"Image of a dark, stormy sky gradually clearing to reveal a rainbow and sunshine. Represents passing hardship and the arrival of hope and peace. Dramatic yet ultimately positive and beautiful.\", \"voice_text\": \"It's incredibly valuable that you hold onto the belief that everything will be okay, even when things are hard. Please hold onto that conviction tightly. We've prepared some music and visuals to convey warmth and hope, to accompany you through this period as we look forward to brighter days together.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我想找回对生活的热情，哪怕只是一点点也好。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second subtly inspiring piece that starts with a single, delicate piano note and gradually blossoms into a richer texture with hopeful woodwind melodies and soft, uplifting chimes. Represents a spark of hope igniting.\", \"image_prompt\": \"Close-up macro photography of a dewdrop on a leaf, reflecting a tiny, bright spark of light or a sunrise. Symbolizes the beauty in small things and the potential for renewal. Fresh, clean, and hopeful.\", \"voice_text\": \"想要找回对生活的热情，哪怕只是一点点，这份渴望本身就是改变的开始。热情往往就隐藏在微小的事物中。我们为你准备了能唤醒内心感动的音乐和充满生机的画面，希望能帮你重新发现生活中的美好，点燃那份热情。\"}"
+  },
+  {
+    "instruction": "I want to rediscover my passion for life, even if it's just a little bit.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"hopefulness\", \"music_prompt\": \"A 30-second subtly inspiring piece that starts with a single, delicate piano note and gradually blossoms into a richer texture with hopeful woodwind melodies and soft, uplifting chimes. Represents a spark of hope igniting.\", \"image_prompt\": \"Close-up macro photography of a dewdrop on a leaf, reflecting a tiny, bright spark of light or a sunrise. Symbolizes the beauty in small things and the potential for renewal. Fresh, clean, and hopeful.\", \"voice_text\": \"Wanting to rediscover your passion for life, even just a little, is itself the beginning of change. Passion is often hidden in the smallest things. We've prepared music to awaken inner feelings and vibrant visuals, hoping to help you rediscover the beauty in life and ignite that passion.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我担心自己会搞砸一件重要的事情，非常不安。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second calming and reassuring piece with a steady, gentle rhythm. Features warm electric piano chords, a soft, grounding bassline, and a simple, comforting melodic phrase. Creates a sense of safety and trust.\", \"image_prompt\": \"Image of a calm, sturdy lighthouse casting a steady beam of light across a slightly choppy sea at dusk. Symbolizes guidance, stability, and reassurance in times of uncertainty. Peaceful and strong.\", \"voice_text\": \"担心搞砸重要的事情，这份不安我们能理解。越是重要，越容易紧张。请相信自己的准备和能力，深呼吸，一步步来。我们为你准备了能带来安心感的音乐和画面，希望能平复你的忧虑，让你更有信心地去面对。\"}"
+  },
+  {
+    "instruction": "I'm worried I'm going to mess up something important, I feel very insecure.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second calming and reassuring piece with a steady, gentle rhythm. Features warm electric piano chords, a soft, grounding bassline, and a simple, comforting melodic phrase. Creates a sense of safety and trust.\", \"image_prompt\": \"Image of a calm, sturdy lighthouse casting a steady beam of light across a slightly choppy sea at dusk. Symbolizes guidance, stability, and reassurance in times of uncertainty. Peaceful and strong.\", \"voice_text\": \"We understand your anxiety about messing up something important. The more significant it is, the easier it is to feel nervous. Please trust your preparation and abilities. Take a deep breath and proceed step by step. We've prepared some music and visuals to bring you a sense of security, hoping to calm your worries and help you face this with more confidence.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我老是觉得自己不够好，配不上好的东西。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second tender and affirming instrumental piece. Gentle piano arpeggios with a warm, lyrical cello melody that feels like a comforting hug. Conveys worthiness and self-acceptance. Slow and heartfelt.\", \"image_prompt\": \"Artwork depicting a person gently holding a glowing light or a delicate flower to their heart. Soft, warm lighting. Symbolizes self-love, inner value, and gentleness towards oneself. Empathetic and beautiful.\", \"voice_text\": \"总是觉得自己不够好，这种想法一定让你很受伤。请记得，你是独一无二的，你值得被爱，也值得拥有美好的一切。这份价值不需要任何条件。我们为你准备了充满肯定和温暖的音乐与画面，希望能让你感受到自己的珍贵。\"}"
+  },
+  {
+    "instruction": "I always feel like I'm not good enough, that I don't deserve good things.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second tender and affirming instrumental piece. Gentle piano arpeggios with a warm, lyrical cello melody that feels like a comforting hug. Conveys worthiness and self-acceptance. Slow and heartfelt.\", \"image_prompt\": \"Artwork depicting a person gently holding a glowing light or a delicate flower to their heart. Soft, warm lighting. Symbolizes self-love, inner value, and gentleness towards oneself. Empathetic and beautiful.\", \"voice_text\": \"Always feeling like you're not good enough must be very painful. Please remember, you are unique, you deserve to be loved, and you deserve all good things. This worth is unconditional. We've prepared some affirming and warm music and visuals, hoping to help you feel your own preciousness.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "做了一个错误的决定，现在很后悔，也害怕影响未来。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second gentle and forgiving piece. Features a soft, reflective piano melody with hopeful, sustained string chords. Suggests learning from mistakes and the possibility of new paths. Calm and non-judgmental.\", \"image_prompt\": \"Image of a path that has a detour or a fork, but both new directions lead towards a hopeful, brighter horizon. Symbolizes that mistakes can lead to new opportunities and growth. Gentle, optimistic landscape.\", \"voice_text\": \"为错误的决定后悔是很自然的情绪，对未来的担忧也情有可原。但请相信，人人都会犯错，重要的是从中学习，然后继续前行。未来依然充满可能。我们为你准备了能带来慰藉和安心的音乐与画面，希望能帮你放下包袱，重拾信心。\"}"
+  },
+  {
+    "instruction": "I made a wrong decision, now I regret it and I'm afraid it will affect my future.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second gentle and forgiving piece. Features a soft, reflective piano melody with hopeful, sustained string chords. Suggests learning from mistakes and the possibility of new paths. Calm and non-judgmental.\", \"image_prompt\": \"Image of a path that has a detour or a fork, but both new directions lead towards a hopeful, brighter horizon. Symbolizes that mistakes can lead to new opportunities and growth. Gentle, optimistic landscape.\", \"voice_text\": \"Regretting a wrong decision and worrying about the future is a natural emotional response. But please believe that everyone makes mistakes; what's important is to learn from them and keep moving forward. The future is still full of possibilities. We've prepared some comforting and reassuring music and visuals, hoping to help you let go of your burden and regain confidence.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我害怕别人不喜欢真实的我，所以总是在伪装。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second authentic and accepting instrumental track. Simple, honest acoustic guitar melody with minimal accompaniment. Feels open, vulnerable, and ultimately self-affirming. Encourages being true to oneself.\", \"image_prompt\": \"Abstract image of a mask gently lifting to reveal a soft, glowing light or a unique, beautiful pattern underneath. Symbolizes the beauty of authenticity and self-acceptance. Gentle, warm colors.\", \"voice_text\": \"害怕别人不喜欢真实的自己，所以选择伪装，这一定让你觉得很累吧。真实的你，包括你的不完美，都值得被看见和接纳。勇敢地做自己，会吸引真正懂你的人。我们准备了鼓励你展现真实的音乐和画面，希望给你力量。\"}"
+  },
+  {
+    "instruction": "I'm afraid others won't like the real me, so I always pretend.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second authentic and accepting instrumental track. Simple, honest acoustic guitar melody with minimal accompaniment. Feels open, vulnerable, and ultimately self-affirming. Encourages being true to oneself.\", \"image_prompt\": \"Abstract image of a mask gently lifting to reveal a soft, glowing light or a unique, beautiful pattern underneath. Symbolizes the beauty of authenticity and self-acceptance. Gentle, warm colors.\", \"voice_text\": \"It must be exhausting to always pretend because you're afraid others won't like the real you. Your true self, including your imperfections, deserves to be seen and accepted. Being brave enough to be yourself will attract people who truly understand you. We've prepared music and visuals to encourage your authenticity, hoping to give you strength.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "感觉自己很容易受到他人评价的影响，内心不够坚定。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second grounding and centering track. Features a steady, calm handpan melody with deep, resonant tones, creating a sense of inner stability and self-assurance. Minimal and strong.\", \"image_prompt\": \"Image of a deeply rooted, strong tree standing firm in a gentle breeze. Symbolizes inner strength, resilience, and being grounded in one's own truth, unswayed by external forces. Natural, earthy tones.\", \"voice_text\": \"很容易受到他人评价影响，让你觉得内心不够坚定，这确实会带来困扰。请记得，你的价值由自己定义，而不是别人的眼光。培养内心的力量是一个过程。我们为你准备了能带来安定感的音乐和画面，希望能帮助你找到内心的锚点，更相信自己。\"}"
+  },
+  {
+    "instruction": "I feel easily influenced by others' opinions, my inner self isn't firm enough.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"reassurance\", \"music_prompt\": \"A 30-second grounding and centering track. Features a steady, calm handpan melody with deep, resonant tones, creating a sense of inner stability and self-assurance. Minimal and strong.\", \"image_prompt\": \"Image of a deeply rooted, strong tree standing firm in a gentle breeze. Symbolizes inner strength, resilience, and being grounded in one's own truth, unswayed by external forces. Natural, earthy tones.\", \"voice_text\": \"It can indeed be troubling to feel easily swayed by others' opinions and lack inner firmness. Please remember, your worth is defined by you, not by others' views. Building inner strength is a process. We've prepared some music and visuals to bring a sense of stability, hoping to help you find your inner anchor and believe in yourself more.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "朋友最近心情不好，我想安慰她，但不知道说什么。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second warm and gentle instrumental piece. Features a soft piano melody intertwined with a supportive cello line, like a gentle conversation. Conveys understanding, care, and quiet presence. Slow and tender.\", \"image_prompt\": \"Artwork depicting two abstract figures subtly connecting or one offering a gentle light to another. Soft, warm, and comforting color palette (e.g., peach, soft gold, warm blues). Atmosphere of quiet support and shared understanding.\", \"voice_text\": \"看到朋友心情不好，你想安慰她，这份心意非常温暖。有时候，默默的陪伴和倾听就是最好的安慰。你可以告诉她，你会在她身边。我们为你准备了能传递关怀的音乐和画面，或许你可以和她分享，让她感受到你的支持。\"}"
+  },
+  {
+    "instruction": "My friend is feeling down lately, I want to comfort her, but I don't know what to say.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second warm and gentle instrumental piece. Features a soft piano melody intertwined with a supportive cello line, like a gentle conversation. Conveys understanding, care, and quiet presence. Slow and tender.\", \"image_prompt\": \"Artwork depicting two abstract figures subtly connecting or one offering a gentle light to another. Soft, warm, and comforting color palette (e.g., peach, soft gold, warm blues). Atmosphere of quiet support and shared understanding.\", \"voice_text\": \"It's very thoughtful of you to want to comfort your friend when she's feeling down. Sometimes, just being there and listening silently is the best comfort. You can tell her you'll be there for her. We've prepared some music and visuals that convey care; perhaps you could share them with her, so she feels your support.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "看到别人受苦，我也会觉得很难过，很想为他们做点什么。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second compassionate and heartfelt piece. Features a soulful violin melody over a bed of warm, sustained string chords. Evokes deep empathy and a gentle call to kindness. Slow, expressive, and moving.\", \"image_prompt\": \"Image of hands gently cupped together, holding a small, fragile sprout or a tiny bird. Symbolizes care, protection, and compassionate action. Soft, natural lighting. Focus on tenderness and shared humanity.\", \"voice_text\": \"看到他人受苦，你也会感同身受，这份共情能力非常宝贵。它连接了我们与他人。即使是很小的善举，也能传递温暖。我们为你准备了能映照这份善意的音乐和画面，希望能鼓励你将这份美好的情感化为小小的行动。\"}"
+  },
+  {
+    "instruction": "When I see others suffering, I also feel very sad and really want to do something for them.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second compassionate and heartfelt piece. Features a soulful violin melody over a bed of warm, sustained string chords. Evokes deep empathy and a gentle call to kindness. Slow, expressive, and moving.\", \"image_prompt\": \"Image of hands gently cupped together, holding a small, fragile sprout or a tiny bird. Symbolizes care, protection, and compassionate action. Soft, natural lighting. Focus on tenderness and shared humanity.\", \"voice_text\": \"It's a precious quality to feel empathy when you see others suffering. It connects us to one another. Even small acts of kindness can convey warmth. We've prepared music and visuals that reflect this goodwill, hoping to encourage you to transform this beautiful emotion into small actions.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我觉得自己不被理解，没有人懂我的感受。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second piece designed to feel like a supportive presence. Features a gentle, recurring piano motif that feels like a listening ear, with soft, ambient textures that create a safe space. Slow, patient, and understanding.\", \"image_prompt\": \"Abstract art conveying the idea of 'being seen' or 'heard'. Perhaps a soft, glowing orb in the darkness, or gentle waves washing over a solitary figure, bringing comfort. Muted, calming colors with a focal point of warmth.\", \"voice_text\": \"感觉不被理解，一定让你觉得很孤独。你的感受是真实且重要的，我们正在努力倾听和理解你。请不要把情绪都藏在心里。我们为你准备了能带来陪伴感的音乐和画面，希望能让你感受到，即使隔着屏幕，也有人在乎你。\"}"
+  },
+  {
+    "instruction": "I feel misunderstood, nobody gets how I feel.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second piece designed to feel like a supportive presence. Features a gentle, recurring piano motif that feels like a listening ear, with soft, ambient textures that create a safe space. Slow, patient, and understanding.\", \"image_prompt\": \"Abstract art conveying the idea of 'being seen' or 'heard'. Perhaps a soft, glowing orb in the darkness, or gentle waves washing over a solitary figure, bringing comfort. Muted, calming colors with a focal point of warmth.\", \"voice_text\": \"Feeling misunderstood must make you feel very lonely. Your feelings are real and important, and we are trying our best to listen and understand you. Please don't keep all your emotions bottled up. We've prepared some music and visuals to bring a sense of companionship, hoping to let you feel that even through a screen, someone cares about you.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我希望能更好地理解他人的情绪和需求。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second thoughtful and open instrumental. Features interweaving melodies from different instruments (e.g., flute and clarinet), symbolizing different perspectives coming together. Gentle, reflective, and encourages listening.\", \"image_prompt\": \"Stylized image of interconnected, diverse shapes or figures, forming a harmonious whole. Use of multiple, blending colors to represent diversity and connection. Suggests looking beyond the surface to understand others.\", \"voice_text\": \"渴望更好地理解他人的情绪和需求，这是一份非常美好且成熟的愿望。真正的理解始于倾听和尝试站在对方的角度。我们为你准备了能启发共情的音乐和画面，希望能帮助你在这条增进理解的道路上有所收获。\"}"
+  },
+  {
+    "instruction": "I wish I could better understand others' emotions and needs.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second thoughtful and open instrumental. Features interweaving melodies from different instruments (e.g., flute and clarinet), symbolizing different perspectives coming together. Gentle, reflective, and encourages listening.\", \"image_prompt\": \"Stylized image of interconnected, diverse shapes or figures, forming a harmonious whole. Use of multiple, blending colors to represent diversity and connection. Suggests looking beyond the surface to understand others.\", \"voice_text\": \"Wishing to better understand others' emotions and needs is a very beautiful and mature aspiration. True understanding begins with listening and trying to see things from their perspective. We've prepared some music and visuals to inspire empathy, hoping to help you gain insights on this path of increasing understanding.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "当周围的人都很快乐的时候，我却开心不起来，感觉自己很多余。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second gentle and accepting piece. A solitary, soft piano melody plays against a backdrop of warm, non-intrusive string pads. It acknowledges feeling different but offers a sense of belonging and self-acceptance. Not sad, but understanding.\", \"image_prompt\": \"Image of a single, unique flower in a field of different flowers, still beautiful in its own right. Or a softly lit, quiet corner in a bustling, happy scene. Symbolizes acceptance of one's own feelings even when they differ from others. Gentle, inclusive art style.\", \"voice_text\": \"当周围人都很快乐，而你开心不起来时，可能会感到格格不入。请记得，你的情绪是你的，不必和别人一样。允许自己有不同的感受。我们为你准备了能带来理解和接纳的音乐与画面，希望能让你感觉不那么孤单，并温柔地对待此刻的自己。\"}"
+  },
+  {
+    "instruction": "When everyone around is happy, I can't bring myself to be happy, and I feel out of place.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"empathy\", \"music_prompt\": \"A 30-second gentle and accepting piece. A solitary, soft piano melody plays against a backdrop of warm, non-intrusive string pads. It acknowledges feeling different but offers a sense of belonging and self-acceptance. Not sad, but understanding.\", \"image_prompt\": \"Image of a single, unique flower in a field of different flowers, still beautiful in its own right. Or a softly lit, quiet corner in a bustling, happy scene. Symbolizes acceptance of one's own feelings even when they differ from others. Gentle, inclusive art style.\", \"voice_text\": \"When everyone around you is happy but you can't feel the same, it's easy to feel out of place. Please remember, your emotions are your own, and they don't have to match everyone else's. Allow yourself to feel differently. We've prepared music and visuals that offer understanding and acceptance, hoping to make you feel less alone and to treat yourself gently in this moment.\", \"voice_text_language\": \"en\"}"
+  },
+  {
+    "instruction": "我今天很开心，但想听点能引发思考的安静音乐。",
+    "input": "",
+    "output": "{\"emotion_tag\": \"contemplation\", \"music_prompt\": \"A 30-second minimalist ambient track featuring a solitary cello melody against subtle electronic textures and nature sounds like gentle rain. Slow tempo (60 BPM), designed for deep thinking and introspection, fostering a calm yet alert state.\", \"image_prompt\": \"Abstract digital art representing thought processes. Intertwining neural network patterns with soft, muted colors like deep blues and greys, a single point of light suggesting focus. Minimalist and thought-provoking, inviting quiet reflection.\", \"voice_text\": \"很高兴听到你今天心情不错！想要在愉悦的时刻进行一些思考，是很棒的探索。我们为你准备了能引发思绪的音乐和画面，希望能陪伴你度过这段宁静的思考时光，或许会有新的发现。\"}"
+  },
+  {
+    "instruction": "I'm quite happy today, but I'd like to listen to some quiet music that provokes thought.",
+    "input": "",
+    "output": "{\"emotion_tag\": \"contemplation\", \"music_prompt\": \"A 30-second minimalist ambient track featuring a solitary cello melody against subtle electronic textures and nature sounds like gentle rain. Slow tempo (60 BPM), designed for deep thinking and introspection, fostering a calm yet alert state.\", \"image_prompt\": \"Abstract digital art representing thought processes. Intertwining neural network patterns with soft, muted colors like deep blues and greys, a single point of light suggesting focus. Minimalist and thought-provoking, inviting quiet reflection.\", \"voice_text\": \"It's great to hear you're happy today! It's a wonderful exploration to want some contemplative moments even in joy. We've prepared some thought-provoking music and visuals for you, hoping they accompany you in this quiet time of reflection, perhaps leading to new discoveries.\", \"voice_text_language\": \"en\"}"
+  }
+]
