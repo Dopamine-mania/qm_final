@@ -1,0 +1,4 @@
+TTS>=0.17.0
+torch>=2.0.0
+numpy>=1.21.0
+soundfile>=0.10.3 
