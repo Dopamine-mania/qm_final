@@ -10,8 +10,12 @@ for p in sys.path:
 
 # 尝试导入 moviepy，如果失败则提供更多信息
 try:
-    from moviepy.editor import ImageClip, AudioFileClip, concatenate_audioclips, afx
-    print("Successfully imported moviepy.editor")
+    import moviepy.editor as mpy
+    ImageClip = mpy.ImageClip
+    AudioFileClip = mpy.AudioFileClip
+    concatenate_audioclips = mpy.concatenate_audioclips
+    afx = mpy.afx
+    print("Successfully imported moviepy.editor using alternative method")
 except ImportError as e:
     print(f"Error importing moviepy.editor: {e}")
     try:
@@ -20,13 +24,6 @@ except ImportError as e:
         print(f"moviepy version: {moviepy.__version__}")
     except ImportError:
         print("moviepy is not installed or cannot be imported")
-    
-    # 尝试使用绝对导入
-    try:
-        import moviepy.editor
-        print("Successfully imported moviepy.editor using absolute import")
-    except ImportError as e:
-        print(f"Absolute import of moviepy.editor failed: {e}")
 
 from PIL import Image
 from typing import Optional

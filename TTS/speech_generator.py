@@ -28,10 +28,19 @@ except ImportError:
         print("Could not import ChatTTS. Please check the path.")
         sys.exit(1)
 
-# 添加一个简单的参数类来替代字典
+# 添加一个完整的参数类来替代字典
 class TextParams:
-    def __init__(self, prompt):
+    def __init__(self, prompt: str):
         self.prompt = prompt
+        self.top_P = 0.7
+        self.top_K = 20
+        self.temperature = 0.7
+        self.repetition_penalty = 1.0
+        self.max_new_token = 384
+        self.min_new_token = 0
+        self.show_tqdm = True
+        self.ensure_non_empty = True
+        self.manual_seed = None
 
 class SpeechGenerator(BaseSpeechGenerator):
     def __init__(self):
