@@ -106,35 +106,17 @@ class MusicGenerator(BaseMusicGenerator):
                 'scheduler_type': 'dpm++',
                 'cfg_type': 'self-attention-v',
                 'omega_scale': 0.7,
-                'actual_seeds': [0],  # Changed from string to list of integers
                 'guidance_interval': 0.98,
                 'guidance_interval_decay': 1.0,
                 'min_guidance_scale': 1.0,
                 'use_erg_tag': True,
                 'use_erg_lyric': True,
                 'use_erg_diffusion': True,
-                'oss_steps': [20],  # Changed from string to list of integers
                 'guidance_scale_text': 0.0,
                 'guidance_scale_lyric': 0.0,
                 'save_path': temp_output_filename
             }
             params.update(kwargs)
-
-            # Ensure actual_seeds is a list of integers
-            if isinstance(params['actual_seeds'], str):
-                params['actual_seeds'] = [int(seed.strip()) for seed in params['actual_seeds'].split(',')]
-            elif isinstance(params['actual_seeds'], int):
-                params['actual_seeds'] = [params['actual_seeds']]
-            elif not isinstance(params['actual_seeds'], list):
-                params['actual_seeds'] = [0]
-
-            # Ensure oss_steps is a list of integers
-            if isinstance(params['oss_steps'], str):
-                params['oss_steps'] = [int(step.strip()) for step in params['oss_steps'].split(',') if step.strip()]
-            elif isinstance(params['oss_steps'], int):
-                params['oss_steps'] = [params['oss_steps']]
-            elif not isinstance(params['oss_steps'], list):
-                params['oss_steps'] = [20]
 
             self.logger.info(f"Running ACEStep pipeline with prompt: '{prompt}'")
             self.pipeline(**params)
