@@ -155,6 +155,7 @@ class MultimodalVideoGenerator:
 
             # 3. Generate Music
             self.logger.info(f"Generating music with prompt: '{music_prompt}'")
+            self.logger.info(f"Music will be saved as: {base_name}_music.wav")
             music_params.setdefault('duration_secs', video_duration)
             music_result = self.music_generator.generate_music(prompt=music_prompt, **music_params)
             music_audio = music_result["audio"]
@@ -163,7 +164,20 @@ class MultimodalVideoGenerator:
             self.music_generator.save_audio(music_audio, music_path, music_sr)
             temp_files.append(music_path)
             
-            # 4. Synthesize Video
+            # 4. Verify file independence
+            self.logger.info("Verifying file independence...")
+            self.logger.info(f"Image file: {image_path}")
+            self.logger.info(f"Speech file: {speech_path}")
+            self.logger.info(f"Music file: {music_path}")
+            
+            # Ensure the files exist and belong to the current scene
+            for file_path in [image_path, speech_path, music_path]:
+                if not os.path.exists(file_path):
+                    raise FileNotFoundError(f"Required file not found: {file_path}")
+                if base_name not in file_path:
+                    raise ValueError(f"File {file_path} does not belong to the current scene ({base_name})")
+            
+            # 5. Synthesize Video
             self.logger.info("Synthesizing video from generated content...")
             video_path = self._create_video(
                 image_path, speech_path, music_path, 
