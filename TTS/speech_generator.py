@@ -28,6 +28,9 @@ except ImportError:
         print("Could not import ChatTTS. Please check the path.")
         sys.exit(1)
 
+# ChatTTS 默认采样率
+SAMPLE_RATE = 24000
+
 # 添加完整的参数类来替代字典
 class TextParams:
     def __init__(self, prompt: str):
@@ -151,7 +154,7 @@ class SpeechGenerator(BaseSpeechGenerator):
 
             return {
                 "audio": audio_array,
-                "sample_rate": self.chat.sample_rate,
+                "sample_rate": SAMPLE_RATE,  # 使用固定的采样率
                 "text": text,
                 "speaker_embedding": speaker
             }
@@ -159,7 +162,7 @@ class SpeechGenerator(BaseSpeechGenerator):
             self.logger.error(f"Error generating speech: {e}")
             raise
 
-    def save_audio(self, audio_data: np.ndarray, output_path: str, sample_rate: int = 24000):
+    def save_audio(self, audio_data: np.ndarray, output_path: str, sample_rate: int = SAMPLE_RATE):
         """
         Saves the generated audio to a file.
 
