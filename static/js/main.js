@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Reset UI state
+        // 重置UI状态
         errorContainer.classList.add('hidden');
         resultContainer.classList.add('hidden');
         submitButton.disabled = true;
@@ -27,18 +27,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.error || 'An error occurred while generating the video');
+                throw new Error(data.error || '生成视频时出错');
             }
 
-            // Update video source and show result
+            // 更新视频源并显示结果
+            console.log("收到视频路径:", data.video_path);
             resultVideo.src = data.video_path;
-            resultContainer.classList.remove('hidden');
-            resultContainer.classList.add('fade-in');
             
-            // Scroll to result
-            resultContainer.scrollIntoView({ behavior: 'smooth' });
+            // 确保视频加载完毕后显示
+            resultVideo.onloadeddata = () => {
+                console.log("视频加载完成");
+                resultContainer.classList.remove('hidden');
+                resultContainer.classList.add('fade-in');
+                
+                // 滚动到结果区域
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            };
+            
+            // 处理视频加载错误
+            resultVideo.onerror = (err) => {
+                console.error("视频加载失败:", err);
+                throw new Error(`视频加载失败: ${data.video_path}`);
+            };
+            
+            // 如果5秒后视频仍未加载，也显示容器
+            setTimeout(() => {
+                if (resultContainer.classList.contains('hidden')) {
+                    resultContainer.classList.remove('hidden');
+                    resultContainer.classList.add('fade-in');
+                }
+            }, 5000);
 
         } catch (error) {
+            console.error("处理出错:", error);
             errorMessage.textContent = error.message;
             errorContainer.classList.remove('hidden');
             errorContainer.classList.add('fade-in');
@@ -48,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Reset form handler
+    // 重置表单处理
     window.resetForm = () => {
         form.reset();
         errorContainer.classList.add('hidden');

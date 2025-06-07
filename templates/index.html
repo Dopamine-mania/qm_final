@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multimedia Generator</title>
+    <title>情感视频生成系统</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-8">
         <header class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Multimedia Generator</h1>
-            <p class="text-gray-600">Transform your text into engaging videos with emotion!</p>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">情感视频生成系统</h1>
+            <p class="text-gray-600">将您的文字转化为富有情感的视频内容</p>
         </header>
 
         <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
             <form id="generatorForm" class="space-y-6">
                 <div>
-                    <label for="inputText" class="block text-sm font-medium text-gray-700 mb-2">Enter your text</label>
+                    <label for="inputText" class="block text-sm font-medium text-gray-700 mb-2">请输入您的文字</label>
                     <textarea
                         id="inputText"
                         name="text"
                         rows="4"
                         class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Type your text here..."
+                        placeholder="在这里输入您想要转换成视频的文字..."
                         required
                     ></textarea>
                 </div>
@@ -33,7 +33,7 @@
                         type="submit"
                         class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
                     >
-                        Generate Video
+                        生成视频
                     </button>
                 </div>
             </form>
@@ -41,22 +41,41 @@
             <div id="progressContainer" class="hidden mt-8">
                 <div class="flex items-center justify-center">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    <span class="ml-3 text-gray-600">Generating your video...</span>
+                    <span class="ml-3 text-gray-600">正在生成您的视频，请稍候...</span>
+                </div>
+                <div class="mt-3 text-center text-sm text-gray-500">
+                    <p>视频生成需要一些时间，请耐心等待</p>
                 </div>
             </div>
 
             <div id="resultContainer" class="hidden mt-8">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Generated Video</h2>
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">生成的视频</h2>
                 <div class="aspect-w-16 aspect-h-9">
                     <video id="resultVideo" controls class="w-full rounded-lg shadow">
-                        Your browser does not support the video tag.
+                        您的浏览器不支持视频标签。
                     </video>
+                </div>
+                <div class="mt-4 text-center">
+                    <button 
+                        onclick="resetForm()" 
+                        class="mt-4 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                    >
+                        重新生成
+                    </button>
                 </div>
             </div>
 
             <div id="errorContainer" class="hidden mt-8">
                 <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                     <p id="errorMessage"></p>
+                </div>
+                <div class="mt-4 text-center">
+                    <button 
+                        onclick="resetForm()" 
+                        class="mt-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                    >
+                        重试
+                    </button>
                 </div>
             </div>
         </div>

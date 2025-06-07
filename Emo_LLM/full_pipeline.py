@@ -236,6 +236,43 @@ def interactive_mode(
             logger.error(f"处理过程中出错: {e}", exc_info=True)
             print(f"\n✗ 生成过程出错: {str(e)}")
 
+def process_text_to_video(user_input: str, output_dir: str = "static/output") -> str:
+    """
+    Web应用程序接口：处理用户输入并生成视频
+    
+    Args:
+        user_input: 用户输入的文本
+        output_dir: 输出目录路径
+        
+    Returns:
+        生成的视频文件的完整路径
+    """
+    logger.info(f"处理文本输入: {user_input}")
+    
+    # 确保输出目录存在
+    os.makedirs(output_dir, exist_ok=True)
+    
+    try:
+        # 1. 加载情感反馈模型
+        model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Model_results/emoheal_merged')
+        emoheal_model = load_emoheal_model(model_path)
+        
+        # 2. 设置生成器
+        multimodal_generator = setup_generators(output_dir)
+        
+        # 3. 生成响应
+        emoheal_response = generate_emoheal_response(emoheal_model, user_input)
+        
+        # 4. 生成多媒体内容
+        video_path = generate_multimedia_content(multimodal_generator, emoheal_response)
+        
+        logger.info(f"视频生成成功: {video_path}")
+        return video_path
+        
+    except Exception as e:
+        logger.error(f"处理过程中出错: {e}", exc_info=True)
+        raise Exception(f"生成视频失败: {str(e)}")
+
 def main():
     args = parse_args()
     
