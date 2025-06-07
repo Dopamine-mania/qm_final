@@ -41,11 +41,26 @@ sys.path.append(os.path.join(parent_dir, 'TTS'))
 sys.path.append(os.path.join(parent_dir, 'TTM'))
 sys.path.append(os.path.join(parent_dir, 'integration2'))
 
+# 确保可以直接导入基类
+tts_path = os.path.join(parent_dir, 'TTS')
+if tts_path not in sys.path:
+    sys.path.insert(0, tts_path)
+    
+# 打印当前 Python 路径，用于调试
+logger.info("Python 路径:")
+for path in sys.path:
+    logger.info(f"  - {path}")
+
 # 导入各个生成器
-from TTI.image_generator import ImageGenerator
-from speech_generator import SpeechGenerator
-from TTM.music_generator import MusicGenerator
-from integration2.multimodal_generator import MultimodalVideoGenerator
+try:
+    from TTI.image_generator import ImageGenerator
+    from speech_generator import SpeechGenerator
+    from TTM.music_generator import MusicGenerator
+    from integration2.multimodal_generator import MultimodalVideoGenerator
+    logger.info("所有模块导入成功!")
+except ImportError as e:
+    logger.error(f"导入模块时出错: {e}")
+    raise
 
 def parse_args():
     parser = argparse.ArgumentParser(description='全流程集成演示')

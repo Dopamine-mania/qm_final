@@ -52,14 +52,22 @@ try:
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
+    # 添加TTS目录到路径
+    tts_path = os.path.join(project_root, 'TTS')
+    if tts_path not in sys.path:
+        sys.path.insert(0, tts_path)
 except NameError:
     # Fallback for interactive environments
     project_root = os.path.abspath('.')
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
+    # 添加TTS目录到路径
+    tts_path = os.path.join(project_root, 'TTS')
+    if tts_path not in sys.path:
+        sys.path.insert(0, tts_path)
 
 from TTI.base_image_generator import BaseImageGenerator
-from TTS.base_speech_generator import BaseSpeechGenerator
+from base_speech_generator import BaseSpeechGenerator
 from TTM.base_music_generator import BaseMusicGenerator
 
 class MultimodalVideoGenerator:

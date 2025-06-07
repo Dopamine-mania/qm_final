@@ -5,7 +5,7 @@ import sys
 import numpy as np
 from typing import Optional, Dict, Any
 from scipy.io.wavfile import write as write_wav
-from TTS.base_speech_generator import BaseSpeechGenerator
+from base_speech_generator import BaseSpeechGenerator
 
 # Add ChatTTS path to sys.path
 # This assumes the script is run from a location where `qm_final` is in the parent directory or root
