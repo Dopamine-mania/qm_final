@@ -99,6 +99,17 @@ def run_generation_task(director: MultimodalVideoGenerator, task_name: str, prom
     logger = logging.getLogger(task_name)
     try:
         logger.info(f"--- Starting scene: {task_name} ---")
+        
+        # Clean up any previous merged audio files to avoid confusion
+        output_dir = "output_video"
+        if os.path.exists(output_dir):
+            for file in os.listdir(output_dir):
+                if file.endswith("_merged_audio.wav"):
+                    try:
+                        os.remove(os.path.join(output_dir, file))
+                    except Exception as e:
+                        logger.warning(f"Could not remove old merged audio file {file}: {e}")
+        
         video_path = director.generate_and_synthesize(
             image_prompt=prompts["image"],
             speech_prompt=prompts["speech"],
@@ -115,49 +126,68 @@ def run_generation_task(director: MultimodalVideoGenerator, task_name: str, prom
             try:
                 import subprocess
                 
-                # Create a unique output file name
+                # Extract base name from the output filename to match the pattern used in multimodal_generator.py
+                base_name = os.path.splitext(params["output_filename"])[0]
+                
+                # Look for specific files matching this scene's base name
+                image_file = os.path.join(video_path, f"{base_name}_image.png")
+                speech_file = os.path.join(video_path, f"{base_name}_speech.wav")
+                music_file = os.path.join(video_path, f"{base_name}_music.wav")
+                
+                # Verify that all required files exist
+                missing_files = []
+                if not os.path.exists(image_file):
+                    missing_files.append(image_file)
+                if not os.path.exists(speech_file):
+                    missing_files.append(speech_file)
+                if not os.path.exists(music_file):
+                    missing_files.append(music_file)
+                
+                if missing_files:
+                    logger.error(f"Missing required files for video synthesis: {missing_files}")
+                    return
+                
+                # Try to merge audio files using ffmpeg
+                merged_audio = os.path.join(video_path, f"{base_name}_merged_audio.wav")
+                logger.info(f"Merging audio files for {task_name}...")
+                logger.info(f"Speech file: {speech_file}")
+                logger.info(f"Music file: {music_file}")
+                
+                subprocess.run([
+                    "ffmpeg", "-y",
+                    "-i", speech_file,
+                    "-i", music_file,
+                    "-filter_complex", "[1:a]volume=0.3[a1];[0:a][a1]amix=inputs=2:duration=longest",
+                    merged_audio
+                ], check=True)
+                
+                # Create video from image and merged audio
                 unique_video_path = os.path.join(video_path, f"{task_name}.mp4")
+                logger.info(f"Creating video for {task_name}...")
+                logger.info(f"Image file: {image_file}")
+                logger.info(f"Merged audio: {merged_audio}")
                 
-                # Get the individual files
-                image_file = None
-                speech_file = None
-                music_file = None
+                subprocess.run([
+                    "ffmpeg", "-y",
+                    "-loop", "1",
+                    "-i", image_file,
+                    "-i", merged_audio,
+                    "-c:v", "libx264",
+                    "-tune", "stillimage",
+                    "-c:a", "aac",
+                    "-b:a", "192k",
+                    "-shortest",
+                    unique_video_path
+                ], check=True)
                 
-                for file in os.listdir(video_path):
-                    if file.endswith('_image.png'):
-                        image_file = os.path.join(video_path, file)
-                    elif file.endswith('_speech.wav'):
-                        speech_file = os.path.join(video_path, file)
-                    elif file.endswith('_music.wav'):
-                        music_file = os.path.join(video_path, file)
+                logger.info(f"--- Created video using ffmpeg: {unique_video_path} ---")
                 
-                if image_file and speech_file and music_file:
-                    # Try to merge audio files using ffmpeg
-                    merged_audio = os.path.join(video_path, "merged_audio.wav")
-                    subprocess.run([
-                        "ffmpeg", "-y",
-                        "-i", speech_file,
-                        "-i", music_file,
-                        "-filter_complex", "[1:a]volume=0.3[a1];[0:a][a1]amix=inputs=2:duration=longest",
-                        merged_audio
-                    ], check=True)
-                    
-                    # Create video from image and merged audio
-                    subprocess.run([
-                        "ffmpeg", "-y",
-                        "-loop", "1",
-                        "-i", image_file,
-                        "-i", merged_audio,
-                        "-c:v", "libx264",
-                        "-tune", "stillimage",
-                        "-c:a", "aac",
-                        "-b:a", "192k",
-                        "-shortest",
-                        unique_video_path
-                    ], check=True)
-                    
-                    logger.info(f"--- Created video using ffmpeg: {unique_video_path} ---")
-                
+                # Clean up merged audio file after video is created
+                try:
+                    os.remove(merged_audio)
+                except Exception as e:
+                    logger.warning(f"Could not remove merged audio file: {e}")
+            
             except (ImportError, subprocess.SubprocessError) as e:
                 logger.warning(f"Couldn't use ffmpeg fallback: {str(e)}")
         else:
