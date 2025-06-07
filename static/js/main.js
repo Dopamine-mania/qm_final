@@ -45,12 +45,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.progress === 100) {
             progressStatus.textContent = '完成！';
             progressStatus.classList.add('text-green-500');
+
+            // 如果有视频URL，设置视频源
+            if (data.video_url) {
+                console.log('设置视频URL:', data.video_url);
+                resultVideo.src = data.video_url;
+                
+                // 显示视频容器
+                setTimeout(() => {
+                    resultContainer.classList.remove('hidden');
+                    resultContainer.classList.add('fade-in');
+                    resultContainer.scrollIntoView({ behavior: 'smooth' });
+                }, 1000);
+            }
         } else {
             progressStatus.textContent = data.message;
         }
 
         // 处理错误状态
         if (data.error) {
+            console.error('处理错误:', data.error);
             errorMessage.textContent = data.error;
             errorContainer.classList.remove('hidden');
             progressContainer.classList.add('hidden');
@@ -77,6 +91,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 如果进度完成，显示视频
             if (data.progress === 100) {
+                // 检查是否有视频URL
+                if (data.video_url) {
+                    console.log('收到视频URL:', data.video_url);
+                    resultVideo.src = data.video_url;
+                    
+                    resultVideo.onloadeddata = () => {
+                        console.log('视频加载完成');
+                    };
+                    
+                    resultVideo.onerror = (err) => {
+                        console.error('视频加载失败:', err);
+                        errorMessage.textContent = '视频加载失败，请检查网络连接或重试';
+                        errorContainer.classList.remove('hidden');
+                    };
+                }
+                
                 // 等待一小段时间确保视频文件已经准备好
                 setTimeout(() => {
                     resultContainer.classList.remove('hidden');

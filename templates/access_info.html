@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>访问信息 - 情感视频生成系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">情感视频生成系统 - 访问链接</h1>
+            <p class="text-gray-600">选择以下任一方式访问系统</p>
+        </header>
+
+        <div class="max-w-3xl mx-auto">
+            {% for method in access_methods %}
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-2">{{ method.name }}</h2>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded mb-3">
+                        <a href="{{ method.url }}" target="_blank" class="text-blue-600 hover:text-blue-800 break-all">{{ method.url }}</a>
+                        <button 
+                            onclick="navigator.clipboard.writeText('{{ method.url }}').then(() => alert('链接已复制到剪贴板'))" 
+                            class="ml-4 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                        >
+                            复制
+                        </button>
+                    </div>
+                    <p class="text-gray-600">{{ method.description }}</p>
+                </div>
+            {% endfor %}
+
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-2">注意事项</h2>
+                <ul class="list-disc pl-5 space-y-2 text-gray-600">
+                    <li>如果您使用的是JupyterHub，请优先使用JupyterHub代理访问链接</li>
+                    <li>公网访问可能需要配置防火墙和端口转发</li>
+                    <li>如需更可靠的公网访问，可使用ngrok等工具</li>
+                </ul>
+            </div>
+
+            <div class="text-center mt-8">
+                <a href="/" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition-colors">
+                    返回主页
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
