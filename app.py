@@ -1,18 +1,51 @@
-from flask import Flask, render_template, request, jsonify, send_file, url_for
+from flask import Flask, render_template, request, jsonify, send_file, url_for, Response
 import os
 from Emo_LLM.full_pipeline import process_text_to_video
 import logging
 import shutil
 import socket
 import json
+import time
 from urllib.request import urlopen
+from queue import Queue
+from threading import Thread
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static/output')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max-limit
 
-# Ensure the upload folder exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+# 全局进度跟踪器
+progress_tracker = {
+    'current_task': '',
+    'progress': 0,
+    'status': 'idle',
+    'message': '',
+    'error': None
+}
+
+# 用于存储SSE客户端连接的队列
+clients = []
+
+def update_progress(task, progress, message=''):
+    """更新进度信息"""
+    progress_tracker['current_task'] = task
+    progress_tracker['progress'] = progress
+    progress_tracker['message'] = message
+    notify_clients()
+
+def notify_clients():
+    """通知所有SSE客户端"""
+    msg = json.dumps({
+        'task': progress_tracker['current_task'],
+        'progress': progress_tracker['progress'],
+        'message': progress_tracker['message'],
+        'error': progress_tracker['error']
+    })
+    for client in clients[:]:
+        try:
+            client.put(msg)
+        except:
+            clients.remove(client)
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, 
@@ -64,6 +97,21 @@ def get_external_url(port=5000, base_url=None):
 def index():
     return render_template('index.html')
 
+@app.route('/progress')
+def progress():
+    """SSE端点，用于发送实时进度更新"""
+    def generate():
+        q = Queue()
+        clients.append(q)
+        try:
+            while True:
+                result = q.get()
+                yield f"data: {result}\n\n"
+        except GeneratorExit:
+            clients.remove(q)
+
+    return Response(generate(), mimetype='text/event-stream')
+
 @app.route('/generate', methods=['POST'])
 def generate_video():
     try:
@@ -73,36 +121,67 @@ def generate_video():
 
         logger.info(f"收到生成请求，输入文本: {input_text}")
         
-        # 处理输入并生成视频
-        output_dir = app.config['UPLOAD_FOLDER']
-        output_path = process_text_to_video(input_text, output_dir)
+        # 重置进度跟踪器
+        progress_tracker['status'] = 'processing'
+        progress_tracker['error'] = None
+        progress_tracker['progress'] = 0
         
-        # 处理路径，确保可从前端访问
-        # 如果是绝对路径，复制到static/output目录
-        if os.path.isabs(output_path):
-            filename = os.path.basename(output_path)
-            destination = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            
-            # 如果不在static目录中，复制过来
-            if output_path != destination:
-                shutil.copy2(output_path, destination)
-                output_path = destination
+        def process_with_progress():
+            try:
+                # 更新进度：情感分析
+                update_progress('emotion_analysis', 10, '正在进行情感分析...')
+                time.sleep(1)  # 给前端一些时间显示进度
+                
+                # 处理输入并生成视频
+                output_dir = app.config['UPLOAD_FOLDER']
+                
+                # 更新进度：生成视频
+                update_progress('generating', 30, '正在生成视频内容...')
+                output_path = process_text_to_video(input_text, output_dir)
+                
+                # 处理路径，确保可从前端访问
+                if os.path.isabs(output_path):
+                    filename = os.path.basename(output_path)
+                    destination = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    
+                    # 更新进度：复制文件
+                    update_progress('copying', 80, '正在处理生成的视频...')
+                    if output_path != destination:
+                        shutil.copy2(output_path, destination)
+                        output_path = destination
+                
+                # 获取相对于static目录的路径
+                static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+                if output_path.startswith(static_dir):
+                    relative_path = os.path.relpath(output_path, start=static_dir)
+                    video_url = url_for('static', filename=relative_path)
+                else:
+                    filename = os.path.basename(output_path)
+                    video_url = url_for('static', filename=f'output/{filename}')
+                
+                logger.info(f"视频生成成功，URL: {video_url}")
+                
+                # 更新进度：完成
+                update_progress('completed', 100, '视频生成完成！')
+                
+                # 通知客户端视频URL
+                notify_clients()
+                return video_url
+                
+            except Exception as e:
+                logger.error(f"视频生成失败: {str(e)}", exc_info=True)
+                progress_tracker['error'] = str(e)
+                progress_tracker['status'] = 'error'
+                notify_clients()
+                raise
         
-        # 获取相对于static目录的路径
-        static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
-        if output_path.startswith(static_dir):
-            relative_path = os.path.relpath(output_path, start=static_dir)
-            video_url = url_for('static', filename=relative_path)
-        else:
-            # 如果不在static目录，取文件名并假设它在output目录
-            filename = os.path.basename(output_path)
-            video_url = url_for('static', filename=f'output/{filename}')
-        
-        logger.info(f"视频生成成功，URL: {video_url}")
+        # 在后台线程中处理
+        thread = Thread(target=process_with_progress)
+        thread.start()
         
         return jsonify({
             'success': True,
-            'video_path': video_url
+            'message': '视频生成已开始，请等待进度更新'
         })
 
     except Exception as e:
