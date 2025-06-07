@@ -100,12 +100,11 @@ def run_generation_task(director: MultimodalVideoGenerator, task_name: str, prom
     try:
         logger.info(f"--- Starting scene: {task_name} ---")
         video_path = director.generate_and_synthesize(
-            name=task_name,
             image_prompt=prompts["image"],
-            text=prompts["speech"],
+            speech_prompt=prompts["speech"],
             music_prompt=prompts["music"],
-            duration=params["video_duration"],
-            output_dir="output_video"
+            video_duration=params["video_duration"],
+            output_filename=params["output_filename"]
         )
         
         if os.path.isdir(video_path):
