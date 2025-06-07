@@ -2,6 +2,9 @@ import os
 import logging
 import torch
 import sys
+from typing import Dict, Any, Optional
+import numpy as np
+from moviepy.editor import ImageClip, AudioFileClip, CompositeAudioClip
 
 # 打印 Python 路径以进行调试
 print("Python sys.path:")
@@ -26,7 +29,6 @@ except ImportError as e:
         print("moviepy is not installed or cannot be imported")
 
 from PIL import Image
-from typing import Optional
 
 # --- Path Setup ---
 # Add project root to sys.path to allow for absolute imports from TTI, TTM, TTS
@@ -166,33 +168,77 @@ class MultimodalVideoGenerator:
                 if os.path.exists(f):
                     os.remove(f)
 
-    def _create_video(self, image_path, speech_path, music_path, output_path, duration):
+    def _create_video(
+        self,
+        image_path: str,
+        speech_path: str,
+        music_path: str,
+        output_path: str,
+        duration: Optional[float] = None,
+        fade_duration: float = 1.0,
+        music_volume: float = 0.3
+    ) -> str:
         """
-        Combines an image, speech, and music into a video.
+        Creates a video from an image and audio files.
+
+        Args:
+            image_path (str): Path to the image file
+            speech_path (str): Path to the speech audio file
+            music_path (str): Path to the music audio file
+            output_path (str): Path where the video should be saved
+            duration (Optional[float]): Duration of the video in seconds. If None, uses speech duration.
+            fade_duration (float): Duration of audio fade in/out in seconds
+            music_volume (float): Volume of the background music (0.0 to 1.0)
+
+        Returns:
+            str: Path to the created video file
         """
         try:
+            # Load audio files
+            speech_audio = AudioFileClip(speech_path)
+            music_audio = AudioFileClip(music_path).volumex(music_volume)
+            
+            # If duration not specified, use speech duration
+            if duration is None:
+                duration = speech_audio.duration
+            
+            # Create image clip with duration
             image_clip = ImageClip(image_path, duration=duration)
-            speech_clip = AudioFileClip(speech_path)
-            music_clip = AudioFileClip(music_path)
-
-            # Lower music volume and loop it for the duration of the video
-            # Use afx.audio_loop if available, for compatibility with modern moviepy
-            looped_music = music_clip.fx(afx.audio_loop, duration=duration).volumex(0.2)
             
-            # Place speech audio on top of the music
-            composite_audio = concatenate_audioclips([speech_clip, looped_music])
-            # Ensure final audio does not exceed video duration
-            final_audio = composite_audio.set_duration(duration)
+            # Adjust music length
+            if music_audio.duration < duration:
+                music_audio = music_audio.loop(duration=duration)
+            else:
+                music_audio = music_audio.subclip(0, duration)
             
-            final_clip = image_clip.set_audio(final_audio)
-            final_clip.write_videofile(
-                output_path, 
-                codec='libx264', 
-                audio_codec='aac', 
+            # Add fade effects to music
+            music_audio = music_audio.audio_fadein(fade_duration).audio_fadeout(fade_duration)
+            
+            # Combine audio tracks
+            final_audio = CompositeAudioClip([speech_audio, music_audio])
+            
+            # Set audio to video
+            final_video = image_clip.set_audio(final_audio)
+            
+            # Ensure output directory exists
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            
+            # Write video file
+            final_video.write_videofile(
+                output_path,
                 fps=24,
-                logger='bar'
+                codec='libx264',
+                audio_codec='aac',
+                temp_audiofile='temp-audio.m4a',
+                remove_temp=True
             )
+            
             return output_path
+            
         except Exception as e:
-            self.logger.error(f"Failed to create video: {e}", exc_info=True)
-            raise 
+            self.logger.error(f"Failed to create video: {str(e)}")
+            raise
+        finally:
+            # Clean up any temporary files
+            if os.path.exists('temp-audio.m4a'):
+                os.remove('temp-audio.m4a') 
