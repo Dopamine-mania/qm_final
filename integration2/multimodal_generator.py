@@ -2,7 +2,32 @@ import os
 import logging
 import torch
 import sys
-from moviepy.editor import ImageClip, AudioFileClip, concatenate_audioclips, afx
+
+# 打印 Python 路径以进行调试
+print("Python sys.path:")
+for p in sys.path:
+    print(f"  - {p}")
+
+# 尝试导入 moviepy，如果失败则提供更多信息
+try:
+    from moviepy.editor import ImageClip, AudioFileClip, concatenate_audioclips, afx
+    print("Successfully imported moviepy.editor")
+except ImportError as e:
+    print(f"Error importing moviepy.editor: {e}")
+    try:
+        import moviepy
+        print(f"moviepy is installed at: {moviepy.__file__}")
+        print(f"moviepy version: {moviepy.__version__}")
+    except ImportError:
+        print("moviepy is not installed or cannot be imported")
+    
+    # 尝试使用绝对导入
+    try:
+        import moviepy.editor
+        print("Successfully imported moviepy.editor using absolute import")
+    except ImportError as e:
+        print(f"Absolute import of moviepy.editor failed: {e}")
+
 from PIL import Image
 from typing import Optional
 
