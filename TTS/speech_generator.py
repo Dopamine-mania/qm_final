@@ -28,6 +28,10 @@ except ImportError:
         print("Could not import ChatTTS. Please check the path.")
         sys.exit(1)
 
+# 添加一个简单的参数类来替代字典
+class TextParams:
+    def __init__(self, prompt):
+        self.prompt = prompt
 
 class SpeechGenerator(BaseSpeechGenerator):
     def __init__(self):
@@ -103,9 +107,8 @@ class SpeechGenerator(BaseSpeechGenerator):
             if speaker is None:
                 speaker = self.chat.sample_random_speaker()
 
-            params_refine_text = {
-                'prompt': f'[oral_{oral}][laugh_{laugh}][break_{break_val}]'
-            }
+            # 使用 TextParams 类而不是字典
+            params_refine_text = TextParams(f'[oral_{oral}][laugh_{laugh}][break_{break_val}]')
             params_infer_code = {
                 'prompt': f'[speed_{speed}]',
                 'spk_emb': speaker,
