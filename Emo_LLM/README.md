@@ -1,76 +1,77 @@
-# Emoheal LLM 测试脚本
+# 情感反馈全流程系统
 
-这个测试脚本用于测试Emoheal模型的情感反馈生成功能。
+本系统将情感反馈大语言模型与多模态生成系统集成，实现了从文本输入到视频生成的全流程。
 
-## 功能
+## 系统组件
 
-该脚本可以:
-- 调用预训练的Emoheal LLM模型
-- 接收用户输入的文本
-- 生成包含emotion_tag、music_prompt、image_prompt和voice_text的情感反馈
-- 支持交互式模式和命令行参数模式
+- **情感反馈模型**：接收用户文本输入，生成情感标签及各个模态的提示词
+- **图像生成模块(TTI)**：基于提示词生成图像
+- **语音合成模块(TTS)**：将文本转换为语音
+- **音乐生成模块(TTM)**：基于情感提示词生成背景音乐
+- **视频合成模块**：将图像、语音和音乐合成为视频
 
-## 目录结构
+## 运行方式
 
-```
-Emo_LLM/
-├── Data/                   # 训练数据
-├── LLaMA-Factory/          # LLaMA-Factory框架
-├── Model_results/          # 模型权重
-│   └── emoheal_merged/     # 微调后的模型权重
-├── test_model.py           # 测试脚本
-├── run_test.sh             # 运行脚本的Shell脚本
-└── README.md               # 本文档
-```
+### 1. 准备环境
 
-## 使用方法
+确保已安装所有必要的依赖，并且三个生成模块(TTI、TTS、TTM)已正确配置。
 
-### 准备工作
+### 2. 运行全流程脚本
 
-确保已经将微调好的模型放在`Model_results/emoheal_merged`目录下。
-
-### 运行方式1: 使用Shell脚本
+#### 交互模式
 
 ```bash
-# 交互模式
-bash run_test.sh
-
-# 直接传入文本参数
-bash run_test.sh --input "我今天心情不太好，感到有点焦虑"
+python full_pipeline.py --interactive
 ```
 
-### 运行方式2: 直接使用Python
+在交互模式下，您可以输入任意文本，系统将生成相应的视频。
+
+#### 单次处理模式
 
 ```bash
-# 交互模式
-python test_model.py
-
-# 直接传入文本参数
-python test_model.py --input "我今天心情不太好，感到有点焦虑"
+python full_pipeline.py --input "您想要处理的文本"
 ```
 
-### 参数说明
+您也可以指定自定义输出目录：
 
-- `--model_path`: 模型路径，默认为`Model_results/emoheal_merged`
-- `--input`: 输入文本，如果不提供则进入交互模式
+```bash
+python full_pipeline.py --input "您想要处理的文本" --output_dir "custom_output"
+```
 
-## 输出示例
+### 3. 参数说明
+
+- `--llm_model_path`：情感反馈模型的路径（默认为 `Model_results/emoheal_merged`）
+- `--input`：用户输入文本
+- `--output_dir`：输出视频目录（默认为 `output_videos`）
+- `--interactive`：启用交互模式
+
+## 输出结果
+
+运行脚本后，系统将：
+
+1. 显示情感反馈模型的JSON响应（情感标签、图像提示词、语音文本、音乐提示词）
+2. 依次生成图像、语音和音乐
+3. 合成最终视频
+4. 显示生成视频的路径
+
+## 示例输出
 
 ```
-===== EMOHEAL RESPONSE =====
-Emotion Tag: calmness
+===== 情感反馈模型响应 =====
+情感标签: happy
 
-Music Prompt: A 30-second soothing ambient piece featuring slow, rhythmic breathing-like pads, gentle flowing water sounds, and a single, reassuring melodic line from a soft flute. Designed for grounding during anxiety.
+音乐提示词: uplifting cheerful melody with bright piano and strings
 
-Image Prompt: Abstract calming art with soft, diffused shapes in light teal and lavender. Flowing, gentle movements, no hard edges. A central, softly glowing orb suggesting inner peace. Overall impression of safety and tranquility.
+图像提示词: A person standing on a mountain peak, arms raised in joy, surrounded by a beautiful sunrise landscape
 
-Voice Text: 听起来你今天感觉不太好，有些焦虑。这种感觉很常见，但确实不舒服。尝试慢慢地深呼吸，专注于当下。我们为你准备了一些平静的音乐和画面，希望能帮你稳住心神，让这种不适感慢慢退去。
+语音文本: 恭喜你成功了！这是值得庆祝的时刻，你应该为自己感到骄傲。你的努力和坚持得到了回报。
 ===========================
+
+✓ 视频生成成功: output_videos/happy_response.mp4
 ```
 
-## 与其他模块集成
+## 注意事项
 
-该模型输出的格式可以直接用于：
-- TTI模块 (Text-to-Image): 使用`image_prompt`生成图像
-- TTS模块 (Text-to-Speech): 使用`voice_text`生成语音
-- TTM模块 (Text-to-Music): 使用`music_prompt`生成音乐 
+- 确保所有模型已正确加载
+- 生成视频可能需要一定时间，请耐心等待
+- 如遇到错误，请查看控制台输出和日志文件 `full_pipeline.log` 
