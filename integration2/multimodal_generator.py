@@ -206,38 +206,13 @@ class MultimodalVideoGenerator:
         Returns:
             str: Path to the created video file
         """
-        # Check if moviepy components are available
-        if ImageClip is None or AudioFileClip is None or CompositeAudioClip is None:
-            self.logger.error("MoviePy components are not available. Cannot create video.")
-            self.logger.info("Instead, copying files to output directory as a fallback.")
-            
-            # Create output directory
-            output_dir = os.path.dirname(output_path)
-            os.makedirs(output_dir, exist_ok=True)
-            
-            # Copy files to output directory with descriptive names
-            import shutil
-            base_name = os.path.splitext(os.path.basename(output_path))[0]
-            
-            image_output = os.path.join(output_dir, f"{base_name}_image.png")
-            speech_output = os.path.join(output_dir, f"{base_name}_speech.wav")
-            music_output = os.path.join(output_dir, f"{base_name}_music.wav")
-            
-            shutil.copy2(image_path, image_output)
-            shutil.copy2(speech_path, speech_output)
-            shutil.copy2(music_path, music_output)
-            
-            self.logger.info(f"Files copied to: {output_dir}")
-            return output_dir
-        
         try:
             # Load audio files
             speech_audio = AudioFileClip(speech_path)
             music_audio = AudioFileClip(music_path)
             
-            # Set music volume (using set_volume instead of volumex)
-            if hasattr(music_audio, 'set_volume'):
-                music_audio = music_audio.set_volume(music_volume)
+            # Set music volume
+            music_audio = music_audio.set_volume(music_volume)
             
             # If duration not specified, use speech duration
             if duration is None:
@@ -248,19 +223,19 @@ class MultimodalVideoGenerator:
             
             # Adjust music length
             if music_audio.duration < duration:
-                # Use loop method if available, otherwise just repeat the clip
-                if hasattr(music_audio, 'loop'):
-                    music_audio = music_audio.loop(duration=duration)
-                else:
-                    # Simple repetition if loop not available
-                    repeats = int(duration / music_audio.duration) + 1
-                    music_audio = CompositeAudioClip([music_audio] * repeats).subclip(0, duration)
-            else:
-                music_audio = music_audio.subclip(0, duration)
+                # Calculate how many times we need to loop the music
+                repeats = int(duration / music_audio.duration) + 1
+                # Create a list of music clips
+                music_clips = [music_audio] * repeats
+                # Concatenate them
+                from moviepy.editor import concatenate_audioclips
+                music_audio = concatenate_audioclips(music_clips)
             
-            # Add fade effects to music if methods are available
-            if hasattr(music_audio, 'audio_fadein') and hasattr(music_audio, 'audio_fadeout'):
-                music_audio = music_audio.audio_fadein(fade_duration).audio_fadeout(fade_duration)
+            # Trim music to exact duration
+            music_audio = music_audio.set_duration(duration)
+            
+            # Add fade effects to music
+            music_audio = music_audio.audio_fadein(fade_duration).audio_fadeout(fade_duration)
             
             # Combine audio tracks
             final_audio = CompositeAudioClip([speech_audio, music_audio])
@@ -271,7 +246,7 @@ class MultimodalVideoGenerator:
             # Ensure output directory exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
-            # Write video file - simplified parameters
+            # Write video file
             final_video.write_videofile(
                 output_path,
                 fps=24,
@@ -284,24 +259,48 @@ class MultimodalVideoGenerator:
         except Exception as e:
             self.logger.error(f"Failed to create video: {str(e)}")
             
-            # Fallback: Copy the files to the output directory
-            output_dir = os.path.dirname(output_path)
-            os.makedirs(output_dir, exist_ok=True)
-            
-            # Copy files to output directory with descriptive names
-            import shutil
-            base_name = os.path.splitext(os.path.basename(output_path))[0]
-            
-            image_output = os.path.join(output_dir, f"{base_name}_image.png")
-            speech_output = os.path.join(output_dir, f"{base_name}_speech.wav")
-            music_output = os.path.join(output_dir, f"{base_name}_music.wav")
-            
-            shutil.copy2(image_path, image_output)
-            shutil.copy2(speech_path, speech_output)
-            shutil.copy2(music_path, music_output)
-            
-            self.logger.info(f"Files copied to: {output_dir} as fallback")
-            return output_dir
+            # Fallback: Use ffmpeg directly
+            try:
+                import subprocess
+                
+                # Create output directory
+                output_dir = os.path.dirname(output_path)
+                os.makedirs(output_dir, exist_ok=True)
+                
+                # First merge the audio files
+                merged_audio = os.path.join(output_dir, "temp_merged_audio.wav")
+                subprocess.run([
+                    "ffmpeg", "-y",
+                    "-i", speech_path,
+                    "-i", music_path,
+                    "-filter_complex", "[1:a]volume=0.3[a1];[0:a][a1]amix=inputs=2:duration=longest",
+                    merged_audio
+                ], check=True)
+                
+                # Then create the video
+                subprocess.run([
+                    "ffmpeg", "-y",
+                    "-loop", "1",
+                    "-i", image_path,
+                    "-i", merged_audio,
+                    "-c:v", "libx264",
+                    "-tune", "stillimage",
+                    "-c:a", "aac",
+                    "-b:a", "192k",
+                    "-shortest",
+                    output_path
+                ], check=True)
+                
+                # Clean up temporary audio file
+                if os.path.exists(merged_audio):
+                    os.remove(merged_audio)
+                
+                return output_path
+                
+            except Exception as e:
+                self.logger.error(f"Failed to create video with ffmpeg: {str(e)}")
+                # Return the directory containing the individual files
+                return os.path.dirname(output_path)
         finally:
             # Clean up any temporary files
             if os.path.exists('temp-audio.m4a'):
