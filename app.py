@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, url_for, Response
+from flask import Flask, render_template, request, jsonify, send_file, url_for, Response, send_from_directory
 import os
 from Emo_LLM.full_pipeline import process_text_to_video
 import logging
@@ -9,6 +9,7 @@ import time
 from urllib.request import urlopen
 from queue import Queue
 from threading import Thread
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, 
@@ -21,7 +22,8 @@ logger = logging.getLogger(__name__)
 # 使用代理前缀创建Flask应用
 proxy_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '')
 app = Flask(__name__, static_url_path=f'{proxy_prefix}/static')
-app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static/output')
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'output')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max-limit
 
 if proxy_prefix:
@@ -29,18 +31,19 @@ if proxy_prefix:
 
 # 全局进度跟踪器
 progress_tracker = {
-    'current_task': '',
+    'current_task': None,
     'progress': 0,
     'status': 'idle',
     'message': '',
-    'error': None
+    'error': None,
+    'video_url': None
 }
 
 # 用于存储SSE客户端连接的队列
 clients = []
 
-def update_progress(task, progress, message=''):
-    """更新进度信息"""
+def update_progress(task: str, progress: int, message: str):
+    """更新进度并通知所有客户端"""
     logger.info(f"更新进度: task={task}, progress={progress}, message={message}")
     progress_tracker['current_task'] = task
     progress_tracker['progress'] = progress
@@ -48,28 +51,32 @@ def update_progress(task, progress, message=''):
     notify_clients()
 
 def notify_clients():
-    """通知所有SSE客户端"""
-    msg = json.dumps({
+    """向所有连接的客户端发送更新"""
+    data = json.dumps({
         'task': progress_tracker['current_task'],
         'progress': progress_tracker['progress'],
         'message': progress_tracker['message'],
         'error': progress_tracker['error'],
         'video_url': progress_tracker.get('video_url', None)
     })
-    logger.info(f"通知客户端: {msg}")
-    removed_clients = []
-    for client in clients[:]:
+    for client in clients[:]:  # 使用切片创建副本以避免并发修改问题
         try:
-            client.put(msg)
+            client.put(data)
         except:
-            removed_clients.append(client)
-    
-    # 移除失败的客户端
-    for client in removed_clients:
-        if client in clients:
-            clients.remove(client)
-    
-    logger.info(f"当前活跃客户端数: {len(clients)}")
+            if client in clients:
+                clients.remove(client)
+
+def get_jupyterhub_prefix():
+    """获取JupyterHub代理前缀"""
+    return os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '')
+
+def make_url(endpoint, **kwargs):
+    """创建包含JupyterHub代理前缀的URL"""
+    url = url_for(endpoint, **kwargs)
+    prefix = get_jupyterhub_prefix()
+    if prefix and not url.startswith(prefix):
+        url = prefix.rstrip('/') + url
+    return url
 
 def get_external_url():
     """尝试获取可以从外部访问的URL"""
@@ -193,10 +200,10 @@ def generate_video():
                 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
                 if output_path.startswith(static_dir):
                     relative_path = os.path.relpath(output_path, start=static_dir)
-                    video_url = url_for('static', filename=relative_path)
+                    video_url = make_url('static', filename=relative_path)
                 else:
                     filename = os.path.basename(output_path)
-                    video_url = url_for('static', filename=f'output/{filename}')
+                    video_url = make_url('static', filename=f'output/{filename}')
                 
                 logger.info(f"视频生成成功，URL: {video_url}")
                 logger.info(f"检查视频文件是否存在: {os.path.exists(output_path)}")
@@ -309,5 +316,12 @@ if __name__ == '__main__':
     logger.info(f"尝试获取的外部访问URL: {external_url}")
     logger.info(f"您也可以访问 /access_info 路由查看所有可能的访问方式")
     
-    # 使用0.0.0.0绑定所有接口，允许外部访问，使用不同端口8080
-    app.run(debug=True, host='0.0.0.0', port=8080) 
+    # 检测是否在JupyterHub环境中
+    if 'JUPYTERHUB_SERVICE_PREFIX' in os.environ:
+        logger.info(f"检测到JupyterHub环境，配置代理前缀: {os.environ['JUPYTERHUB_SERVICE_PREFIX']}")
+    
+    # 获取端口号
+    port = int(os.environ.get('PORT', 8080))
+    
+    # 启动服务器
+    app.run(host='0.0.0.0', port=port, debug=True, threaded=True) 

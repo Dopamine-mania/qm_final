@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorContainer = document.getElementById('errorContainer');
     const errorMessage = document.getElementById('errorMessage');
     const submitButton = form.querySelector('button[type="submit"]');
+    const connectionStatus = document.getElementById('connection-status');
+    const connectionDot = document.getElementById('connection-dot');
 
     // 进度相关元素
     const progressBar = document.getElementById('progressBar');
@@ -31,60 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function updateProgress(data) {
-        // 更新进度条
-        progressBar.style.width = `${data.progress}%`;
-        progressText.textContent = `${data.progress}%`;
-        progressMessage.textContent = data.message;
-
-        // 更新步骤状态
-        const steps = {
-            'emotion_analysis': { element: step1Icon, threshold: 10 },
-            'generating': { element: step2Icon, threshold: 30 },
-            'copying': { element: step3Icon, threshold: 80 }
-        };
-
-        // 更新步骤图标
-        Object.entries(steps).forEach(([key, info]) => {
-            if (data.progress >= info.threshold) {
-                info.element.classList.remove('bg-gray-200');
-                info.element.classList.add('bg-green-500');
-            }
-        });
-
-        // 处理完成状态
-        if (data.progress === 100) {
-            progressStatus.textContent = '完成！';
-            progressStatus.classList.add('text-green-500');
-
-            // 如果有视频URL，设置视频源
-            if (data.video_url) {
-                debugLog('设置视频URL:', data.video_url);
-                resultVideo.src = data.video_url;
-                
-                // 显示视频容器
-                setTimeout(() => {
-                    resultContainer.classList.remove('hidden');
-                    resultContainer.classList.add('fade-in');
-                    resultContainer.scrollIntoView({ behavior: 'smooth' });
-                }, 1000);
-            }
-        } else {
-            progressStatus.textContent = data.message;
+    function getBaseUrl() {
+        // 获取当前URL的路径部分
+        const pathParts = window.location.pathname.split('/');
+        // 在JupyterHub环境中，URL格式为 /user/{username}/proxy/{port}/
+        const proxyIndex = pathParts.indexOf('proxy');
+        if (proxyIndex !== -1) {
+            // 返回到proxy端口的完整路径
+            return pathParts.slice(0, proxyIndex + 2).join('/');
         }
-
-        // 处理错误状态
-        if (data.error) {
-            debugLog('处理错误:', data.error);
-            errorMessage.textContent = data.error;
-            errorContainer.classList.remove('hidden');
-            progressContainer.classList.add('hidden');
-            submitButton.disabled = false;
-            if (eventSource) {
-                eventSource.close();
-                eventSource = null;
-            }
-        }
+        return '';
     }
 
     function setupEventSource() {
@@ -92,16 +50,30 @@ document.addEventListener('DOMContentLoaded', () => {
             eventSource.close();
         }
 
-        // 获取完整的进度请求URL
-        const progressUrl = new URL('/progress', window.location.href).href;
-        debugLog('创建SSE连接:', progressUrl);
-        
+        const baseUrl = getBaseUrl();
+        const progressUrl = `${baseUrl}/progress`;
+        debugLog('设置SSE连接URL:', progressUrl);
+
         eventSource = new EventSource(progressUrl);
         
         eventSource.onopen = () => {
             debugLog('SSE连接已建立');
+            connectionStatus.textContent = '服务器连接正常';
+            connectionStatus.classList.remove('bg-yellow-100', 'text-yellow-800');
+            connectionStatus.classList.add('bg-green-100', 'text-green-800');
+            connectionDot.classList.remove('bg-yellow-500');
+            connectionDot.classList.add('bg-green-500');
         };
-        
+
+        eventSource.onerror = () => {
+            debugLog('SSE连接错误');
+            connectionStatus.textContent = '服务器连接断开';
+            connectionStatus.classList.remove('bg-green-100', 'text-green-800');
+            connectionStatus.classList.add('bg-red-100', 'text-red-800');
+            connectionDot.classList.remove('bg-green-500');
+            connectionDot.classList.add('bg-red-500');
+        };
+
         eventSource.onmessage = (event) => {
             debugLog('收到进度更新', event.data);
             const data = JSON.parse(event.data);
@@ -112,7 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 检查是否有视频URL
                 if (data.video_url) {
                     debugLog('收到视频URL:', data.video_url);
-                    resultVideo.src = data.video_url;
+                    // 确保视频URL包含正确的基础路径
+                    const baseUrl = getBaseUrl();
+                    const fullVideoUrl = data.video_url.startsWith('http') ? 
+                        data.video_url : 
+                        `${baseUrl}${data.video_url.startsWith('/') ? '' : '/'}${data.video_url}`;
+                    
+                    resultVideo.src = fullVideoUrl;
                     
                     resultVideo.onloadeddata = () => {
                         debugLog('视频加载完成');
@@ -140,33 +118,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1000);
             }
         };
-
-        eventSource.onerror = (error) => {
-            debugLog('SSE连接错误:', error);
-            eventSource.close();
-            eventSource = null;
-            errorMessage.textContent = '与服务器的连接中断';
-            errorContainer.classList.remove('hidden');
-            progressContainer.classList.add('hidden');
-            submitButton.disabled = false;
-        };
     }
+
+    function updateProgress(data) {
+        // 更新进度条
+        progressBar.style.width = `${data.progress}%`;
+        progressText.textContent = `${data.progress}%`;
+        progressMessage.textContent = data.message;
+
+        // 更新步骤状态
+        const steps = {
+            'emotion_analysis': { element: step1Icon, threshold: 10 },
+            'generating': { element: step2Icon, threshold: 30 },
+            'copying': { element: step3Icon, threshold: 80 }
+        };
+
+        // 更新步骤图标
+        Object.entries(steps).forEach(([key, info]) => {
+            if (data.progress >= info.threshold) {
+                info.element.classList.remove('bg-gray-200');
+                info.element.classList.add('bg-green-500');
+            }
+        });
+
+        // 处理完成状态
+        if (data.progress === 100) {
+            progressStatus.textContent = '完成！';
+            progressStatus.classList.add('text-green-500');
+        } else {
+            progressStatus.textContent = data.message;
+        }
+    }
+
+    // 初始化SSE连接
+    setupEventSource();
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        debugLog('表单提交开始');
         
-        // 重置UI状态
+        // 禁用提交按钮
+        submitButton.disabled = true;
+        
+        // 重置容器状态
         errorContainer.classList.add('hidden');
         resultContainer.classList.add('hidden');
-        submitButton.disabled = true;
         progressContainer.classList.remove('hidden');
-
-        // 重置进度条和图标状态
+        
+        // 重置进度条和图标
         progressBar.style.width = '0%';
         progressText.textContent = '0%';
-        progressStatus.textContent = '准备中...';
-        progressMessage.textContent = '';
         [step1Icon, step2Icon, step3Icon].forEach(icon => {
             icon.classList.remove('bg-green-500');
             icon.classList.add('bg-gray-200');
@@ -181,7 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
             debugLog(`开始处理文本: "${inputText}"`);
             
             // 获取完整的生成请求URL
-            const generateUrl = new URL('/generate', window.location.href).href;
+            const baseUrl = getBaseUrl();
+            const generateUrl = `${baseUrl}/generate`;
             debugLog('发送生成请求:', generateUrl);
             
             const response = await fetch(generateUrl, {
