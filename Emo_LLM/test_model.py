@@ -48,7 +48,7 @@ def generate_response(model: ChatModel, text: str) -> Dict[str, Any]:
     messages = [{"role": "user", "content": text}]
     
     # 获取模型响应
-    response = model.chat(messages)[0].content
+    response = model.chat(messages)[0].response_text
     
     # 解析并返回响应
     return format_response(response)
