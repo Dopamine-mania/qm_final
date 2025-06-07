@@ -95,19 +95,77 @@ def main():
 
 
 def run_generation_task(director: MultimodalVideoGenerator, task_name: str, prompts: dict, params: dict):
-    """ Helper function to run a video generation task. """
+    """ Runs a specific generation task with the given configuration. """
     logger = logging.getLogger(task_name)
-    logger.info(f"--- Starting scene: {task_name} ---")
     try:
+        logger.info(f"--- Starting scene: {task_name} ---")
         video_path = director.generate_and_synthesize(
+            name=task_name,
             image_prompt=prompts["image"],
-            speech_prompt=prompts["speech"],
+            text=prompts["speech"],
             music_prompt=prompts["music"],
-            **params
+            duration=params["video_duration"],
+            output_dir="output_video"
         )
-        logger.info(f"--- Scene '{task_name}' wrapped! Video at: {os.path.abspath(video_path)} ---")
+        
+        if os.path.isdir(video_path):
+            # If video_path is a directory, it means individual files were saved but video wasn't created
+            logger.info(f"--- Scene '{task_name}' wrapped! Individual files saved at: {video_path} ---")
+            
+            # Try using ffmpeg as a fallback if available
+            try:
+                import subprocess
+                
+                # Create a unique output file name
+                unique_video_path = os.path.join(video_path, f"{task_name}.mp4")
+                
+                # Get the individual files
+                image_file = None
+                speech_file = None
+                music_file = None
+                
+                for file in os.listdir(video_path):
+                    if file.endswith('_image.png'):
+                        image_file = os.path.join(video_path, file)
+                    elif file.endswith('_speech.wav'):
+                        speech_file = os.path.join(video_path, file)
+                    elif file.endswith('_music.wav'):
+                        music_file = os.path.join(video_path, file)
+                
+                if image_file and speech_file and music_file:
+                    # Try to merge audio files using ffmpeg
+                    merged_audio = os.path.join(video_path, "merged_audio.wav")
+                    subprocess.run([
+                        "ffmpeg", "-y",
+                        "-i", speech_file,
+                        "-i", music_file,
+                        "-filter_complex", "[1:a]volume=0.3[a1];[0:a][a1]amix=inputs=2:duration=longest",
+                        merged_audio
+                    ], check=True)
+                    
+                    # Create video from image and merged audio
+                    subprocess.run([
+                        "ffmpeg", "-y",
+                        "-loop", "1",
+                        "-i", image_file,
+                        "-i", merged_audio,
+                        "-c:v", "libx264",
+                        "-tune", "stillimage",
+                        "-c:a", "aac",
+                        "-b:a", "192k",
+                        "-shortest",
+                        unique_video_path
+                    ], check=True)
+                    
+                    logger.info(f"--- Created video using ffmpeg: {unique_video_path} ---")
+                
+            except (ImportError, subprocess.SubprocessError) as e:
+                logger.warning(f"Couldn't use ffmpeg fallback: {str(e)}")
+        else:
+            logger.info(f"--- Scene '{task_name}' wrapped! Video at: {video_path} ---")
+            
     except Exception as e:
-        logger.error(f"--- Scene '{task_name}' failed! Error: {e} ---", exc_info=True)
+        logger.error(f"--- Scene '{task_name}' failed! Error: {str(e)} ---", exc_info=True)
 
 
 if __name__ == "__main__":

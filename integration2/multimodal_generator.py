@@ -234,7 +234,11 @@ class MultimodalVideoGenerator:
         try:
             # Load audio files
             speech_audio = AudioFileClip(speech_path)
-            music_audio = AudioFileClip(music_path).volumex(music_volume)
+            music_audio = AudioFileClip(music_path)
+            
+            # Set music volume (using set_volume instead of volumex)
+            if hasattr(music_audio, 'set_volume'):
+                music_audio = music_audio.set_volume(music_volume)
             
             # If duration not specified, use speech duration
             if duration is None:
@@ -268,15 +272,12 @@ class MultimodalVideoGenerator:
             # Ensure output directory exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             
-            # Write video file
+            # Write video file - simplified parameters
             final_video.write_videofile(
                 output_path,
                 fps=24,
                 codec='libx264',
-                audio_codec='aac',
-                temp_audiofile='temp-audio.m4a',
-                remove_temp=True,
-                logger='bar'
+                audio_codec='aac'
             )
             
             return output_path
@@ -305,4 +306,7 @@ class MultimodalVideoGenerator:
         finally:
             # Clean up any temporary files
             if os.path.exists('temp-audio.m4a'):
-                os.remove('temp-audio.m4a') 
+                try:
+                    os.remove('temp-audio.m4a')
+                except:
+                    pass 
