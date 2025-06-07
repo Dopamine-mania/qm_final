@@ -7,4 +7,5 @@ diffusers>=0.21.0
 transformers>=4.30.0
 tqdm>=4.65.0
 matplotlib>=3.5.0
-librosa>=0.10.0 
+librosa>=0.10.0
+flask==2.0.1 
