@@ -132,13 +132,15 @@ class MultimodalVideoGenerator:
         speech_params = speech_params or {}
         music_params = music_params or {}
         
+        # Create unique temp filenames based on output_filename
+        base_name = os.path.splitext(output_filename)[0]
         temp_files = []
         try:
             # 1. Generate Image
             self.logger.info(f"Generating image with prompt: '{image_prompt}'")
             img_result = self.image_generator.generate_image(prompt=image_prompt, **image_params)
             image = img_result["images"][0]
-            image_path = os.path.join(self.output_dir, "temp_image.png")
+            image_path = os.path.join(self.output_dir, f"{base_name}_image.png")
             self.image_generator.save_image(image, image_path)
             temp_files.append(image_path)
 
@@ -147,7 +149,7 @@ class MultimodalVideoGenerator:
             speech_result = self.speech_generator.generate_speech(text=speech_prompt, **speech_params)
             speech_audio = speech_result["audio"]
             speech_sr = speech_result["sample_rate"]
-            speech_path = os.path.join(self.output_dir, "temp_speech.wav")
+            speech_path = os.path.join(self.output_dir, f"{base_name}_speech.wav")
             self.speech_generator.save_audio(speech_audio, speech_path, speech_sr)
             temp_files.append(speech_path)
 
@@ -157,7 +159,7 @@ class MultimodalVideoGenerator:
             music_result = self.music_generator.generate_music(prompt=music_prompt, **music_params)
             music_audio = music_result["audio"]
             music_sr = music_result["sample_rate"]
-            music_path = os.path.join(self.output_dir, "temp_music.wav")
+            music_path = os.path.join(self.output_dir, f"{base_name}_music.wav")
             self.music_generator.save_audio(music_audio, music_path, music_sr)
             temp_files.append(music_path)
             
@@ -176,11 +178,8 @@ class MultimodalVideoGenerator:
             self.logger.error(f"An error occurred during generation or synthesis: {e}", exc_info=True)
             raise
         finally:
-            # 5. Cleanup
-            self.logger.info("Cleaning up temporary files...")
-            for f in temp_files:
-                if os.path.exists(f):
-                    os.remove(f)
+            # Don't clean up temp files anymore since we want to keep them for ffmpeg fallback
+            pass
 
     def _create_video(
         self,
