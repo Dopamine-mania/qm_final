@@ -43,7 +43,7 @@ sys.path.append(os.path.join(parent_dir, 'integration2'))
 
 # 导入各个生成器
 from TTI.image_generator import ImageGenerator
-from TTS.speech_generator import SpeechGenerator
+from speech_generator import SpeechGenerator
 from TTM.music_generator import MusicGenerator
 from integration2.multimodal_generator import MultimodalVideoGenerator
 
