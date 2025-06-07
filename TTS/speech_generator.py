@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import numpy as np
+from typing import Optional, Dict, Any
 from scipy.io.wavfile import write as write_wav
 from TTS.base_speech_generator import BaseSpeechGenerator
 
