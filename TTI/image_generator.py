@@ -4,8 +4,9 @@ from typing import Optional, Dict, Any, List
 import logging
 from PIL import Image
 import numpy as np
+from TTI.base_image_generator import BaseImageGenerator
 
-class ImageGenerator:
+class ImageGenerator(BaseImageGenerator):
     def __init__(self, model_id: str = "playgroundai/playground-v2.5-1024px-aesthetic"):
         """
         初始化图像生成器

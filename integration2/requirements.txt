@@ -1,0 +1,23 @@
+# Core
+torch
+transformers
+# For TTI
+diffusers
+Pillow
+# For TTS (ChatTTS)
+# ChatTTS requirements
+numpy
+scipy
+# For TTM (MusicGen)
+scipy
+# For Video Synthesis
+moviepy
+# For pathing and execution
+ipython 
+
+# Specific versions for compatibility can be added, e.g., torch>=2.0.0
+# These are handled by the sub-directory requirements if they exist.
+# We are including key dependencies here for the integration.
+accelerate
+safetensors
+protobuf 

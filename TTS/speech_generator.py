@@ -1,134 +1,146 @@
 import torch
-from transformers import AutoProcessor, AutoModel
-from typing import Optional, Dict, Any, List
 import logging
 import os
+import sys
 import numpy as np
-from scipy.io import wavfile
-import soundfile as sf
+from scipy.io.wavfile import write as write_wav
+from TTS.base_speech_generator import BaseSpeechGenerator
 
-class SpeechGenerator:
-    def __init__(self, model_id: str = "suno/bark"):
+# Add ChatTTS path to sys.path
+# This assumes the script is run from a location where `qm_final` is in the parent directory or root
+# A more robust solution might involve setting PYTHONPATH environment variable
+try:
+    # Assuming this script is in qm_final/TTS
+    chat_tts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'ChatTTS'))
+    if chat_tts_path not in sys.path:
+        sys.path.append(chat_tts_path)
+    import ChatTTS
+except ImportError:
+    # Fallback for different execution contexts
+    try:
+        # Assuming execution from qm_final/integration2
+        chat_tts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'TTS', 'ChatTTS'))
+        if chat_tts_path not in sys.path:
+            sys.path.append(chat_tts_path)
+        import ChatTTS
+    except ImportError:
+        print("Could not import ChatTTS. Please check the path.")
+        sys.exit(1)
+
+
+class SpeechGenerator(BaseSpeechGenerator):
+    def __init__(self):
         """
-        初始化语音生成器
-        
-        Args:
-            model_id: 语音生成模型ID，默认使用Bark
+        Initializes the Speech Generator using ChatTTS.
         """
         self.logger = logging.getLogger(__name__)
-        self.model_id = model_id
-        self.processor = None
-        self.model = None
-        
-    def load_model(self, device: str = "cuda" if torch.cuda.is_available() else "cpu"):
+        self.chat = ChatTTS.Chat()
+        self.model_loaded = False
+
+    def load_model(self, source='local', **kwargs):
         """
-        加载模型
-        
+        Loads the ChatTTS model.
+
         Args:
-            device: 运行设备
+            source (str): The source to load the model from ('local', 'huggingface', 'custom').
+            **kwargs: Additional arguments for chat.load().
         """
+        if self.model_loaded:
+            self.logger.info("ChatTTS model is already loaded.")
+            return
+
         try:
-            self.processor = AutoProcessor.from_pretrained(self.model_id)
-            self.model = AutoModel.from_pretrained(
-                self.model_id,
-                torch_dtype=torch.float16 if device == "cuda" else torch.float32
-            ).to(device)
-            self.logger.info(f"Model loaded successfully on {device}")
-        except Exception as e:
-            self.logger.error(f"Error loading model: {str(e)}")
-            raise
+            # Change directory to the ChatTTS root to ensure it finds asset/config folders
+            # This is based on the notebook's `os.chdir(root_dir)`
+            original_dir = os.getcwd()
+            chat_tts_root = os.path.abspath(os.path.join(os.path.dirname(__file__), 'ChatTTS'))
+            os.chdir(chat_tts_root)
             
+            self.chat.load(source=source, **kwargs)
+            self.model_loaded = True
+            self.logger.info(f"ChatTTS model loaded successfully from source: {source}.")
+
+        except Exception as e:
+            self.logger.error(f"Error loading ChatTTS model: {e}")
+            raise
+        finally:
+            # Restore the original directory
+            os.chdir(original_dir)
+
     def generate_speech(
         self,
         text: str,
-        voice_preset: Optional[str] = None,
-        language: str = "en",
-        temperature: float = 0.7,
+        speaker: Optional[np.ndarray] = None,
+        speed: Optional[int] = 5,
+        oral: Optional[int] = 2,
+        laugh: Optional[int] = 0,
+        break_val: Optional[int] = 6,
+        temperature: float = 0.3,
         **kwargs
     ) -> Dict[str, Any]:
         """
-        生成语音
-        
+        Generates speech from text.
+
         Args:
-            text: 要转换的文本
-            voice_preset: 声音预设（可选）
-            language: 语言代码
-            temperature: 采样温度
-            **kwargs: 其他参数
-            
+            text (str): The input text.
+            speaker (np.ndarray, optional): A sampled random speaker embedding. Defaults to None for random speaker.
+            speed (int, optional): Speaking speed. Defaults to 5.
+            oral (int, optional): Oral level.
+            laugh (int, optional): Laugh level.
+            break_val (int, optional): Break level.
+            temperature (float, optional): Sampling temperature.
+            **kwargs: Additional arguments for chat.infer().
+
         Returns:
-            包含生成语音信息的字典
+            Dict[str, Any]: A dictionary containing the audio array and other info.
         """
-        if self.model is None or self.processor is None:
-            raise RuntimeError("Model not loaded. Call load_model() first.")
-            
+        if not self.model_loaded:
+            raise RuntimeError("ChatTTS model not loaded. Call load_model() first.")
+
         try:
-            # 准备输入
-            inputs = self.processor(
-                text=text,
-                voice_preset=voice_preset,
-                return_tensors="pt"
-            ).to(self.model.device)
+            # If no speaker is provided, sample a random one
+            if speaker is None:
+                speaker = self.chat.sample_random_speaker()
+
+            params_refine_text = {
+                'prompt': f'[oral_{oral}][laugh_{laugh}][break_{break_val}]'
+            }
+            params_infer_code = {
+                'prompt': f'[speed_{speed}]',
+                'spk_emb': speaker,
+                'temperature': temperature
+            }
+
+            # chat.infer returns a list of audio arrays
+            wavs = self.chat.infer([text], params_refine_text=params_refine_text, params_infer_code=params_infer_code, **kwargs)
             
-            # 生成语音
-            with torch.no_grad():
-                output = self.model.generate(
-                    **inputs,
-                    do_sample=True,
-                    temperature=temperature,
-                    **kwargs
-                )
-            
-            # 转换为numpy数组
-            audio_array = output.cpu().numpy().squeeze()
-            
+            # Extract the first audio array
+            audio_array = wavs[0]
+
             return {
                 "audio": audio_array,
+                "sample_rate": self.chat.sample_rate,
                 "text": text,
-                "voice_preset": voice_preset,
-                "language": language,
-                "parameters": {
-                    "temperature": temperature,
-                    **kwargs
-                }
+                "speaker_embedding": speaker
             }
-            
         except Exception as e:
-            self.logger.error(f"Error generating speech: {str(e)}")
+            self.logger.error(f"Error generating speech: {e}")
             raise
-            
-    def save_audio(self, audio: np.ndarray, output_path: str, sample_rate: int = 24000):
+
+    def save_audio(self, audio_data: np.ndarray, output_path: str, sample_rate: int = 24000):
         """
-        保存生成的音频
-        
+        Saves the generated audio to a file.
+
         Args:
-            audio: 音频数据
-            output_path: 输出路径
-            sample_rate: 采样率
+            audio_data (np.ndarray): The audio data.
+            output_path (str): The path to save the audio file.
+            sample_rate (int): The sample rate of the audio.
         """
         try:
-            # 确保输出目录存在
+            # Ensure the output directory exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            
-            # 保存音频文件
-            sf.write(output_path, audio, sample_rate)
+            write_wav(output_path, sample_rate, audio_data)
             self.logger.info(f"Audio saved to {output_path}")
         except Exception as e:
-            self.logger.error(f"Error saving audio: {str(e)}")
-            raise
-            
-    def get_available_voices(self) -> List[str]:
-        """
-        获取可用的声音预设列表
-        
-        Returns:
-            声音预设列表
-        """
-        return [
-            "v2/en_speaker_0",  # 英语男声
-            "v2/en_speaker_1",  # 英语女声
-            "v2/zh_speaker_0",  # 中文男声
-            "v2/zh_speaker_1",  # 中文女声
-            "v2/ja_speaker_0",  # 日语男声
-            "v2/ja_speaker_1",  # 日语女声
-        ] 
+            self.logger.error(f"Error saving audio: {e}")
+            raise 
