@@ -28,7 +28,7 @@ except ImportError:
         print("Could not import ChatTTS. Please check the path.")
         sys.exit(1)
 
-# 添加一个完整的参数类来替代字典
+# 添加完整的参数类来替代字典
 class TextParams:
     def __init__(self, prompt: str):
         self.prompt = prompt
@@ -37,6 +37,25 @@ class TextParams:
         self.temperature = 0.7
         self.repetition_penalty = 1.0
         self.max_new_token = 384
+        self.min_new_token = 0
+        self.show_tqdm = True
+        self.ensure_non_empty = True
+        self.manual_seed = None
+
+class InferCodeParams:
+    def __init__(self, prompt: str, spk_emb: Optional[np.ndarray] = None):
+        self.prompt = prompt
+        self.spk_emb = spk_emb
+        self.spk_smp = None
+        self.txt_smp = None
+        self.temperature = 0.3
+        self.repetition_penalty = 1.05
+        self.max_new_token = 2048
+        self.stream_batch = 24
+        self.stream_speed = 12000
+        self.pass_first_n_batches = 2
+        self.top_P = 0.7
+        self.top_K = 20
         self.min_new_token = 0
         self.show_tqdm = True
         self.ensure_non_empty = True
@@ -116,13 +135,13 @@ class SpeechGenerator(BaseSpeechGenerator):
             if speaker is None:
                 speaker = self.chat.sample_random_speaker()
 
-            # 使用 TextParams 类而不是字典
+            # 使用参数类而不是字典
             params_refine_text = TextParams(f'[oral_{oral}][laugh_{laugh}][break_{break_val}]')
-            params_infer_code = {
-                'prompt': f'[speed_{speed}]',
-                'spk_emb': speaker,
-                'temperature': temperature
-            }
+            params_infer_code = InferCodeParams(
+                prompt=f'[speed_{speed}]',
+                spk_emb=speaker
+            )
+            params_infer_code.temperature = temperature
 
             # chat.infer returns a list of audio arrays
             wavs = self.chat.infer([text], params_refine_text=params_refine_text, params_infer_code=params_infer_code, **kwargs)
