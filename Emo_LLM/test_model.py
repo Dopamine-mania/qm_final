@@ -102,7 +102,7 @@ def main():
     # 设置模型参数
     model_args = {
         "model_name_or_path": args.model_path,
-        "infer_backend": "hf",    # 使用Huggingface后端
+        "infer_backend": "huggingface",    # 使用Huggingface后端
         "trust_remote_code": True  # 信任远程代码
     }
     

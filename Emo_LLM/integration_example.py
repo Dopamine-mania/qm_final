@@ -49,7 +49,7 @@ def load_emoheal_model(model_path: str) -> ChatModel:
     
     model_args = {
         "model_name_or_path": model_path,
-        "infer_backend": "hf",
+        "infer_backend": "huggingface",
         "trust_remote_code": True
     }
     
