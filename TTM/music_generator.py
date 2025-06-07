@@ -95,22 +95,21 @@ class MusicGenerator(BaseMusicGenerator):
             # We need to run it, then load the audio back to return the array.
             temp_output_filename = os.path.join(os.path.dirname(__file__), "temp_acestep_output.wav")
 
-            # Default ACEStep parameters from the infer-api.py
-            # These can be overridden by kwargs.
+            # Default ACEStep parameters based on working examples
             params = {
                 'audio_duration': float(duration_secs),
                 'prompt': prompt,
                 'lyrics': lyrics,
                 'infer_step': infer_step,
                 'guidance_scale': guidance_scale,
-                'scheduler_type': 'dpm++',
-                'cfg_type': 'self-attention-v',
-                'omega_scale': 0.7,
-                'guidance_interval': 0.98,
-                'guidance_interval_decay': 1.0,
-                'min_guidance_scale': 1.0,
+                'scheduler_type': 'euler',  # Changed from dpm++ to euler based on working examples
+                'cfg_type': 'apg',  # Changed from self-attention-v to apg based on working examples
+                'omega_scale': 10.0,  # Adjusted based on working examples
+                'guidance_interval': 0.5,  # Adjusted based on working examples
+                'guidance_interval_decay': 0.0,  # Adjusted based on working examples
+                'min_guidance_scale': 3.0,  # Adjusted based on working examples
                 'use_erg_tag': True,
-                'use_erg_lyric': True,
+                'use_erg_lyric': False,  # Changed to False based on working examples
                 'use_erg_diffusion': True,
                 'guidance_scale_text': 0.0,
                 'guidance_scale_lyric': 0.0,
