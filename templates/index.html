@@ -12,6 +12,10 @@
         <header class="text-center mb-12">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">情感视频生成系统</h1>
             <p class="text-gray-600">将您的文字转化为富有情感的视频内容</p>
+            <div id="connection-status" class="mt-2 inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800">
+                <span id="connection-dot" class="w-2 h-2 rounded-full bg-yellow-500 mr-1"></span>
+                正在连接服务器...
+            </div>
         </header>
 
         <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
@@ -65,6 +69,11 @@
                         <span class="text-sm text-gray-600">处理输出文件</span>
                     </div>
                 </div>
+                
+                <!-- 处理时间提示 -->
+                <div class="mt-4 p-3 bg-blue-50 text-blue-700 rounded-md">
+                    <p class="text-sm">视频生成可能需要1-2分钟，请耐心等待。如果长时间没有响应，请检查网络连接或刷新页面重试。</p>
+                </div>
             </div>
 
             <div id="resultContainer" class="hidden mt-8">
@@ -97,9 +106,55 @@
                     </button>
                 </div>
             </div>
+            
+            <!-- 系统状态和提示 -->
+            <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                <h3 class="text-md font-medium text-gray-700 mb-2">使用提示</h3>
+                <ul class="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                    <li>输入表达情感的文字，系统会生成与情感相匹配的视频</li>
+                    <li>生成过程分为三个阶段：情感分析、视频生成和文件处理</li>
+                    <li>视频生成可能需要1-2分钟，请耐心等待</li>
+                    <li>如遇到问题，可以点击右下角的"Debug"按钮查看详细日志</li>
+                </ul>
+            </div>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // 连接状态检测
+        document.addEventListener('DOMContentLoaded', () => {
+            const connectionStatus = document.getElementById('connection-status');
+            const connectionDot = document.getElementById('connection-dot');
+            
+            // 检查服务器健康状态
+            function checkServerHealth() {
+                fetch('/health')
+                    .then(response => {
+                        if (response.ok) {
+                            connectionStatus.className = "mt-2 inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-green-100 text-green-800";
+                            connectionDot.className = "w-2 h-2 rounded-full bg-green-500 mr-1";
+                            connectionStatus.textContent = "服务器连接正常";
+                        } else {
+                            connectionStatus.className = "mt-2 inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-red-100 text-red-800";
+                            connectionDot.className = "w-2 h-2 rounded-full bg-red-500 mr-1";
+                            connectionStatus.textContent = "服务器连接异常";
+                        }
+                    })
+                    .catch(err => {
+                        connectionStatus.className = "mt-2 inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold bg-red-100 text-red-800";
+                        connectionDot.className = "w-2 h-2 rounded-full bg-red-500 mr-1";
+                        connectionStatus.textContent = "无法连接到服务器";
+                        console.error("健康检查失败:", err);
+                    });
+            }
+            
+            // 初始检查
+            checkServerHealth();
+            
+            // 定期检查
+            setInterval(checkServerHealth, 10000);
+        });
+    </script>
 </body>
 </html> 

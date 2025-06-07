@@ -10,9 +10,22 @@ from urllib.request import urlopen
 from queue import Queue
 from threading import Thread
 
-app = Flask(__name__)
+# 配置日志
+logging.basicConfig(level=logging.INFO, 
+                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                   handlers=[logging.StreamHandler(), 
+                             logging.FileHandler("flask_app.log", mode='w')])
+
+logger = logging.getLogger(__name__)
+
+# 使用代理前缀创建Flask应用
+proxy_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '')
+app = Flask(__name__, static_url_path=f'{proxy_prefix}/static')
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static/output')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max-limit
+
+if proxy_prefix:
+    logger.info(f"检测到JupyterHub环境，配置代理前缀: {proxy_prefix}")
 
 # 全局进度跟踪器
 progress_tracker = {
@@ -28,6 +41,7 @@ clients = []
 
 def update_progress(task, progress, message=''):
     """更新进度信息"""
+    logger.info(f"更新进度: task={task}, progress={progress}, message={message}")
     progress_tracker['current_task'] = task
     progress_tracker['progress'] = progress
     progress_tracker['message'] = message
@@ -42,19 +56,20 @@ def notify_clients():
         'error': progress_tracker['error'],
         'video_url': progress_tracker.get('video_url', None)
     })
+    logger.info(f"通知客户端: {msg}")
+    removed_clients = []
     for client in clients[:]:
         try:
             client.put(msg)
         except:
+            removed_clients.append(client)
+    
+    # 移除失败的客户端
+    for client in removed_clients:
+        if client in clients:
             clients.remove(client)
-
-# 配置日志
-logging.basicConfig(level=logging.INFO, 
-                   format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                   handlers=[logging.StreamHandler(), 
-                             logging.FileHandler("flask_app.log", mode='w')])
-
-logger = logging.getLogger(__name__)
+    
+    logger.info(f"当前活跃客户端数: {len(clients)}")
 
 def get_external_url():
     """尝试获取可以从外部访问的URL"""
@@ -79,20 +94,36 @@ def get_external_url():
 
 @app.route('/')
 def index():
+    """主页"""
+    logger.info("访问主页")
     return render_template('index.html')
 
 @app.route('/progress')
 def progress():
     """SSE端点，用于发送实时进度更新"""
+    logger.info("新的SSE连接建立")
+    
     def generate():
         q = Queue()
         clients.append(q)
         try:
+            # 立即发送当前状态
+            current_state = json.dumps({
+                'task': progress_tracker['current_task'],
+                'progress': progress_tracker['progress'],
+                'message': progress_tracker['message'],
+                'error': progress_tracker['error'],
+                'video_url': progress_tracker.get('video_url', None)
+            })
+            yield f"data: {current_state}\n\n"
+            
             while True:
                 result = q.get()
                 yield f"data: {result}\n\n"
         except GeneratorExit:
-            clients.remove(q)
+            logger.info("SSE连接关闭")
+            if q in clients:
+                clients.remove(q)
 
     return Response(generate(), mimetype='text/event-stream')
 
@@ -109,6 +140,7 @@ def generate_video():
         progress_tracker['status'] = 'processing'
         progress_tracker['error'] = None
         progress_tracker['progress'] = 0
+        progress_tracker['video_url'] = None
         
         def process_with_progress():
             try:
@@ -169,11 +201,17 @@ def generate_video():
                 logger.info(f"视频生成成功，URL: {video_url}")
                 logger.info(f"检查视频文件是否存在: {os.path.exists(output_path)}")
                 
+                # 确保视频文件路径可访问
+                full_path = os.path.join(static_dir, 'output', filename)
+                logger.info(f"完整视频文件路径: {full_path}")
+                logger.info(f"文件是否存在: {os.path.exists(full_path)}")
+                
                 # 更新进度：完成
                 update_progress('completed', 100, '视频生成完成！')
                 
                 # 设置视频URL
                 progress_tracker['video_url'] = video_url
+                progress_tracker['status'] = 'completed'
                 
                 # 通知客户端视频URL
                 notify_clients()
@@ -247,6 +285,19 @@ def access_info():
         pass
     
     return render_template('access_info.html', access_methods=access_methods)
+
+# 健康检查端点
+@app.route('/health')
+def health_check():
+    """健康检查端点，用于确认服务器运行状态"""
+    logger.info("健康检查请求")
+    return jsonify({
+        'status': 'ok',
+        'timestamp': time.time(),
+        'jupyterhub_prefix': os.environ.get('JUPYTERHUB_SERVICE_PREFIX', None),
+        'current_progress': progress_tracker['progress'],
+        'active_clients': len(clients)
+    })
 
 if __name__ == '__main__':
     # 确保上传目录存在

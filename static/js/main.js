@@ -20,6 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let eventSource = null;
 
+    // 添加调试功能
+    function debugLog(message, data) {
+        console.log(`[DEBUG] ${message}`, data || '');
+        // 如果页面上有调试元素，也可以显示在页面上
+        if (window.debugElement) {
+            const debugItem = document.createElement('div');
+            debugItem.textContent = `${new Date().toISOString()} - ${message}`;
+            window.debugElement.appendChild(debugItem);
+        }
+    }
+
     function updateProgress(data) {
         // 更新进度条
         progressBar.style.width = `${data.progress}%`;
@@ -48,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 如果有视频URL，设置视频源
             if (data.video_url) {
-                console.log('设置视频URL:', data.video_url);
+                debugLog('设置视频URL:', data.video_url);
                 resultVideo.src = data.video_url;
                 
                 // 显示视频容器
@@ -64,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 处理错误状态
         if (data.error) {
-            console.error('处理错误:', data.error);
+            debugLog('处理错误:', data.error);
             errorMessage.textContent = data.error;
             errorContainer.classList.remove('hidden');
             progressContainer.classList.add('hidden');
@@ -81,27 +92,34 @@ document.addEventListener('DOMContentLoaded', () => {
             eventSource.close();
         }
 
-        eventSource = new EventSource('/progress');
+        // 获取完整的进度请求URL
+        const progressUrl = new URL('/progress', window.location.href).href;
+        debugLog('创建SSE连接:', progressUrl);
+        
+        eventSource = new EventSource(progressUrl);
+        
+        eventSource.onopen = () => {
+            debugLog('SSE连接已建立');
+        };
         
         eventSource.onmessage = (event) => {
+            debugLog('收到进度更新', event.data);
             const data = JSON.parse(event.data);
-            console.log('Progress update:', data);
-            
             updateProgress(data);
 
             // 如果进度完成，显示视频
             if (data.progress === 100) {
                 // 检查是否有视频URL
                 if (data.video_url) {
-                    console.log('收到视频URL:', data.video_url);
+                    debugLog('收到视频URL:', data.video_url);
                     resultVideo.src = data.video_url;
                     
                     resultVideo.onloadeddata = () => {
-                        console.log('视频加载完成');
+                        debugLog('视频加载完成');
                     };
                     
                     resultVideo.onerror = (err) => {
-                        console.error('视频加载失败:', err);
+                        debugLog('视频加载失败:', err);
                         errorMessage.textContent = '视频加载失败，请检查网络连接或重试';
                         errorContainer.classList.remove('hidden');
                     };
@@ -124,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         eventSource.onerror = (error) => {
-            console.error('EventSource failed:', error);
+            debugLog('SSE连接错误:', error);
             eventSource.close();
             eventSource = null;
             errorMessage.textContent = '与服务器的连接中断';
@@ -136,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        debugLog('表单提交开始');
         
         // 重置UI状态
         errorContainer.classList.add('hidden');
@@ -158,22 +177,31 @@ document.addEventListener('DOMContentLoaded', () => {
             setupEventSource();
             
             const formData = new FormData(form);
+            const inputText = formData.get('text');
+            debugLog(`开始处理文本: "${inputText}"`);
             
-            const response = await fetch('/generate', {
+            // 获取完整的生成请求URL
+            const generateUrl = new URL('/generate', window.location.href).href;
+            debugLog('发送生成请求:', generateUrl);
+            
+            const response = await fetch(generateUrl, {
                 method: 'POST',
                 body: formData
             });
 
+            debugLog('收到响应:', response.status);
+            
             const data = await response.json();
+            debugLog('响应数据:', data);
 
             if (!response.ok) {
                 throw new Error(data.error || '生成视频时出错');
             }
 
-            console.log('Generation started:', data);
+            debugLog('生成任务已启动:', data);
 
         } catch (error) {
-            console.error("处理出错:", error);
+            debugLog("处理出错:", error);
             errorMessage.textContent = error.message;
             errorContainer.classList.remove('hidden');
             errorContainer.classList.add('fade-in');
@@ -187,6 +215,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 添加一个调试元素到页面（可选）
+    function addDebugElement() {
+        const debugDiv = document.createElement('div');
+        debugDiv.id = 'debug-log';
+        debugDiv.style.cssText = 'position: fixed; bottom: 0; right: 0; width: 400px; max-height: 300px; overflow-y: auto; background: rgba(0,0,0,0.8); color: #0f0; padding: 10px; font-family: monospace; font-size: 12px; z-index: 9999; display: none;';
+        document.body.appendChild(debugDiv);
+        
+        const debugToggle = document.createElement('button');
+        debugToggle.textContent = 'Debug';
+        debugToggle.style.cssText = 'position: fixed; bottom: 0; right: 0; z-index: 10000; padding: 5px; background: #333; color: #fff; border: none;';
+        debugToggle.onclick = () => {
+            debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
+        };
+        document.body.appendChild(debugToggle);
+        
+        window.debugElement = debugDiv;
+        
+        debugLog('调试日志已初始化');
+    }
+    
     // 重置表单处理
     window.resetForm = () => {
         form.reset();
@@ -210,4 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.classList.add('bg-gray-200');
         });
     };
+    
+    // 添加调试元素
+    addDebugElement();
 }); 
