@@ -122,22 +122,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateProgress(data) {
         // 更新进度条
-        progressBar.style.width = `${data.progress}%`;
-        progressText.textContent = `${data.progress}%`;
+        const currentProgress = parseInt(progressBar.style.width) || 0;
+        const targetProgress = data.progress;
+        
+        // 使用动画平滑过渡到目标进度
+        if (currentProgress < targetProgress) {
+            const step = Math.ceil((targetProgress - currentProgress) / 10);
+            let progress = currentProgress;
+            
+            const progressInterval = setInterval(() => {
+                progress = Math.min(progress + step, targetProgress);
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${progress}%`;
+                
+                if (progress >= targetProgress) {
+                    clearInterval(progressInterval);
+                }
+            }, 100);
+        }
+        
         progressMessage.textContent = data.message;
 
         // 更新步骤状态
         const steps = {
-            'emotion_analysis': { element: step1Icon, threshold: 10 },
-            'generating': { element: step2Icon, threshold: 30 },
-            'copying': { element: step3Icon, threshold: 80 }
+            'emotion_analysis': { 
+                element: step1Icon, 
+                threshold: 10,
+                message: '正在分析文本情感...'
+            },
+            'generating': { 
+                element: step2Icon, 
+                threshold: 30,
+                message: '正在生成视频内容...'
+            },
+            'copying': { 
+                element: step3Icon, 
+                threshold: 80,
+                message: '正在处理输出文件...'
+            }
         };
 
-        // 更新步骤图标
+        // 更新步骤图标和状态文本
         Object.entries(steps).forEach(([key, info]) => {
             if (data.progress >= info.threshold) {
+                // 添加完成动画
                 info.element.classList.remove('bg-gray-200');
-                info.element.classList.add('bg-green-500');
+                info.element.classList.add('bg-green-500', 'step-complete');
+                
+                // 更新状态文本
+                const stepText = info.element.nextElementSibling;
+                if (stepText) {
+                    stepText.classList.add('text-green-600', 'font-medium');
+                    if (data.task === key) {
+                        stepText.textContent = info.message;
+                    }
+                }
             }
         });
 
@@ -147,6 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
             progressStatus.classList.add('text-green-500');
         } else {
             progressStatus.textContent = data.message;
+        }
+        
+        // 处理错误状态
+        if (data.error) {
+            errorMessage.textContent = data.error;
+            errorContainer.classList.remove('hidden');
+            progressContainer.classList.add('hidden');
+            submitButton.disabled = false;
         }
     }
 

@@ -200,10 +200,13 @@ def generate_video():
                 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
                 if output_path.startswith(static_dir):
                     relative_path = os.path.relpath(output_path, start=static_dir)
-                    video_url = make_url('static', filename=relative_path)
                 else:
                     filename = os.path.basename(output_path)
-                    video_url = make_url('static', filename=f'output/{filename}')
+                    relative_path = f'output/{filename}'
+                
+                # 在应用上下文中生成URL
+                with app.app_context():
+                    video_url = make_url('static', filename=relative_path)
                 
                 logger.info(f"视频生成成功，URL: {video_url}")
                 logger.info(f"检查视频文件是否存在: {os.path.exists(output_path)}")

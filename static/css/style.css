@@ -40,7 +40,7 @@ button:disabled {
 }
 
 .progress-bar {
-    animation: progress 2s ease-in-out infinite;
+    transition: width 0.3s ease-in-out;
 }
 
 /* 进度条动画 */
@@ -50,7 +50,7 @@ button:disabled {
 
 /* 步骤图标样式 */
 .step-icon {
-    transition: background-color 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
 }
 
 /* 完成状态图标 */
@@ -97,4 +97,56 @@ button:disabled {
 
 .step-complete {
     animation: stepComplete 0.5s ease-out;
+}
+
+/* 步骤状态文本过渡 */
+.step-text {
+    transition: all 0.3s ease-in-out;
+}
+
+/* 进度条容器样式 */
+.progress-container {
+    background: rgba(243, 244, 246, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(229, 231, 235, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 进度步骤样式 */
+.step-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.step-item.active {
+    opacity: 1;
+}
+
+/* 进度指示器动画 */
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.progress-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    animation: pulse 1.5s infinite;
+}
+
+/* 错误状态动画 */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.error-shake {
+    animation: shake 0.5s ease-in-out;
 } 
