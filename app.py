@@ -10,6 +10,7 @@ from urllib.request import urlopen
 from queue import Queue
 from threading import Thread
 from werkzeug.middleware.proxy_fix import ProxyFix
+from urllib.parse import urljoin
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, 
@@ -21,10 +22,18 @@ logger = logging.getLogger(__name__)
 
 # 使用代理前缀创建Flask应用
 proxy_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '')
-app = Flask(__name__, static_url_path=f'{proxy_prefix}/static')
+app = Flask(__name__)
+
+# 配置Flask应用
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'output')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max-limit
+
+# 配置JupyterHub相关设置
+if proxy_prefix:
+    app.config['APPLICATION_ROOT'] = proxy_prefix.rstrip('/')
+    app.config['PREFERRED_URL_SCHEME'] = 'https'
+    app.config['SERVER_NAME'] = 'hub.comp-teach.qmul.ac.uk'  # JupyterHub的主机名
 
 if proxy_prefix:
     logger.info(f"检测到JupyterHub环境，配置代理前缀: {proxy_prefix}")
@@ -70,12 +79,29 @@ def get_jupyterhub_prefix():
     """获取JupyterHub代理前缀"""
     return os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '')
 
-def make_url(endpoint, **kwargs):
-    """创建包含JupyterHub代理前缀的URL"""
-    url = url_for(endpoint, **kwargs)
-    prefix = get_jupyterhub_prefix()
-    if prefix and not url.startswith(prefix):
-        url = prefix.rstrip('/') + url
+def get_file_url(filepath: str) -> str:
+    """生成文件的URL，处理JupyterHub代理路径"""
+    # 获取相对于static目录的路径
+    static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+    if filepath.startswith(static_dir):
+        relative_path = os.path.relpath(filepath, start=static_dir)
+    else:
+        relative_path = os.path.basename(filepath)
+        if not relative_path.startswith('output/'):
+            relative_path = f'output/{relative_path}'
+
+    # 构建基础URL
+    jupyterhub_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '')
+    if jupyterhub_prefix:
+        # JupyterHub环境
+        base_url = f"{jupyterhub_prefix.rstrip('/')}/proxy/8080/static/"
+        return f"{base_url}{relative_path}"
+    else:
+        # 本地环境
+        return f"/static/{relative_path}"
+
+    # 记录生成的URL
+    logger.info(f"生成的文件URL: {url}")
     return url
 
 def get_external_url():
@@ -153,7 +179,7 @@ def generate_video():
             try:
                 # 更新进度：情感分析
                 update_progress('emotion_analysis', 10, '正在进行情感分析...')
-                time.sleep(1)  # 给前端一些时间显示进度
+                time.sleep(1)
                 
                 # 确保输出目录存在
                 output_dir = app.config['UPLOAD_FOLDER']
@@ -164,7 +190,6 @@ def generate_video():
                 update_progress('generating', 30, '正在生成视频内容...')
                 
                 try:
-                    # 记录详细的调试信息
                     logger.info(f"调用process_text_to_video函数，参数: text={input_text}, output_dir={output_dir}")
                     output_path = process_text_to_video(input_text, output_dir)
                     logger.info(f"process_text_to_video返回的输出路径: {output_path}")
@@ -175,7 +200,6 @@ def generate_video():
                     notify_clients()
                     raise
                 
-                # 确保输出路径存在
                 if not output_path or not os.path.exists(output_path):
                     error_msg = f"视频文件未生成或路径不存在: {output_path}"
                     logger.error(error_msg)
@@ -185,36 +209,19 @@ def generate_video():
                     raise Exception(error_msg)
                 
                 # 处理路径，确保可从前端访问
-                if os.path.isabs(output_path):
-                    filename = os.path.basename(output_path)
-                    destination = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    
-                    # 更新进度：复制文件
-                    update_progress('copying', 80, '正在处理生成的视频...')
-                    logger.info(f"复制视频文件从 {output_path} 到 {destination}")
-                    if output_path != destination:
-                        shutil.copy2(output_path, destination)
-                        output_path = destination
+                filename = os.path.basename(output_path)
+                destination = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 
-                # 获取相对于static目录的路径
-                static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
-                if output_path.startswith(static_dir):
-                    relative_path = os.path.relpath(output_path, start=static_dir)
-                else:
-                    filename = os.path.basename(output_path)
-                    relative_path = f'output/{filename}'
+                # 更新进度：复制文件
+                update_progress('copying', 80, '正在处理生成的视频...')
+                logger.info(f"复制视频文件从 {output_path} 到 {destination}")
+                if output_path != destination:
+                    shutil.copy2(output_path, destination)
+                    output_path = destination
                 
-                # 在应用上下文中生成URL
-                with app.app_context():
-                    video_url = make_url('static', filename=relative_path)
-                
+                # 生成视频URL
+                video_url = create_file_url(output_path)
                 logger.info(f"视频生成成功，URL: {video_url}")
-                logger.info(f"检查视频文件是否存在: {os.path.exists(output_path)}")
-                
-                # 确保视频文件路径可访问
-                full_path = os.path.join(static_dir, 'output', filename)
-                logger.info(f"完整视频文件路径: {full_path}")
-                logger.info(f"文件是否存在: {os.path.exists(full_path)}")
                 
                 # 更新进度：完成
                 update_progress('completed', 100, '视频生成完成！')
@@ -223,7 +230,7 @@ def generate_video():
                 progress_tracker['video_url'] = video_url
                 progress_tracker['status'] = 'completed'
                 
-                # 通知客户端视频URL
+                # 通知客户端
                 notify_clients()
                 return video_url
                 
@@ -309,6 +316,29 @@ def health_check():
         'active_clients': len(clients)
     })
 
+def create_file_url(filepath: str) -> str:
+    """为文件创建可访问的URL"""
+    # 获取文件名
+    filename = os.path.basename(filepath)
+    
+    # 确保文件在static/output目录中
+    if not filename.startswith('output/'):
+        filename = f'output/{filename}'
+    
+    # 获取JupyterHub前缀
+    jupyterhub_prefix = os.environ.get('JUPYTERHUB_SERVICE_PREFIX', '')
+    
+    if jupyterhub_prefix:
+        # JupyterHub环境
+        # 使用相对路径，让浏览器基于当前URL构建完整路径
+        url = f"./static/{filename}"
+    else:
+        # 本地环境
+        url = f"/static/{filename}"
+    
+    logger.info(f"为文件 {filepath} 创建URL: {url}")
+    return url
+
 if __name__ == '__main__':
     # 确保上传目录存在
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -320,8 +350,9 @@ if __name__ == '__main__':
     logger.info(f"您也可以访问 /access_info 路由查看所有可能的访问方式")
     
     # 检测是否在JupyterHub环境中
-    if 'JUPYTERHUB_SERVICE_PREFIX' in os.environ:
-        logger.info(f"检测到JupyterHub环境，配置代理前缀: {os.environ['JUPYTERHUB_SERVICE_PREFIX']}")
+    if proxy_prefix:
+        logger.info(f"检测到JupyterHub环境，配置代理前缀: {proxy_prefix}")
+        logger.info(f"检测到JupyterHub环境，服务前缀: {proxy_prefix}")
     
     # 获取端口号
     port = int(os.environ.get('PORT', 8080))

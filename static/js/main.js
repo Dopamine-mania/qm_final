@@ -34,15 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getBaseUrl() {
-        // 获取当前URL的路径部分
-        const pathParts = window.location.pathname.split('/');
-        // 在JupyterHub环境中，URL格式为 /user/{username}/proxy/{port}/
-        const proxyIndex = pathParts.indexOf('proxy');
-        if (proxyIndex !== -1) {
-            // 返回到proxy端口的完整路径
-            return pathParts.slice(0, proxyIndex + 2).join('/');
+        // 获取当前页面的路径
+        const path = window.location.pathname;
+        // 检查是否在JupyterHub环境中
+        const match = path.match(/\/user\/[^/]+\/proxy\/8080\//);
+        if (match) {
+            // 返回JupyterHub代理路径
+            return path.substring(0, match.index + match[0].length);
         }
-        return '';
+        return '/';
     }
 
     function setupEventSource() {
@@ -309,4 +309,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 添加调试元素
     addDebugElement();
+
+    function handleServerSentEvent(event) {
+        const data = JSON.parse(event.data);
+        console.log('收到SSE更新:', data);
+
+        // 更新进度条和状态
+        updateProgress(data);
+
+        // 如果有错误，显示错误信息
+        if (data.error) {
+            showError(data.error);
+            return;
+        }
+
+        // 如果有视频URL且状态为completed，显示视频
+        if (data.video_url && data.status === 'completed') {
+            // 构建完整的视频URL
+            const videoUrl = new URL(data.video_url, window.location.href).href;
+            console.log('处理后的视频URL:', videoUrl);
+            showVideo(videoUrl);
+        }
+    }
 }); 
