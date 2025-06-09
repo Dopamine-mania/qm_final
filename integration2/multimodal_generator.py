@@ -142,6 +142,13 @@ class MultimodalVideoGenerator:
         if speech_text is None:
             speech_text = speech_prompt
         
+        # 记录字幕状态
+        if enable_subtitles:
+            self.logger.info(f"Subtitles enabled with text: {speech_text[:50]}...")
+        else:
+            self.logger.info("Subtitles disabled")
+            speech_text = None
+        
         # Create unique temp filenames based on output_filename
         base_name = os.path.splitext(output_filename)[0]
         temp_files = []
@@ -205,23 +212,31 @@ class MultimodalVideoGenerator:
                 if not os.path.exists(file_path):
                     raise FileNotFoundError(f"Required file not found: {file_path}")
             
-            # 5. Synthesize Video
+            # 5. Synthesize the video
             self.logger.info("Synthesizing video from generated content...")
-            video_path = self._create_slideshow_video(
-                image_paths, speech_path, music_path, 
-                os.path.join(self.output_dir, output_filename), 
-                duration=video_duration,
-                speech_text=speech_text if enable_subtitles else None
-            )
-            self.logger.info(f"Successfully created video at: {video_path}")
-            
-            return video_path
-
+            try:
+                video_path = self._create_slideshow_video(
+                    image_paths=image_paths,
+                    speech_path=speech_path,
+                    music_path=music_path,
+                    output_path=os.path.join(self.output_dir, output_filename), 
+                    duration=video_duration,
+                    speech_text=speech_text
+                )
+                self.logger.info(f"Successfully created video at: {video_path}")
+                return video_path
+            except Exception as e:
+                self.logger.error(f"An error occurred during video synthesis: {e}")
+                raise
+                
         except Exception as e:
-            self.logger.error(f"An error occurred during generation or synthesis: {e}", exc_info=True)
+            self.logger.error(f"An error occurred during generation or synthesis: {str(e)}")
             raise
         finally:
-            # Don't clean up temp files anymore since we want to keep them for ffmpeg fallback
+            # Optionally clean up temp files
+            # for file_path in temp_files:
+            #     if os.path.exists(file_path):
+            #         os.remove(file_path)
             pass
 
     def _create_slideshow_video_ffmpeg(
@@ -232,13 +247,15 @@ class MultimodalVideoGenerator:
         output_path: str,
         duration: Optional[float] = None,
         fade_duration: float = 1.0,
-        music_volume: float = 0.3
+        music_volume: float = 0.3,
+        speech_text: Optional[str] = None
     ) -> str:
         """
-        使用ffmpeg创建视频的回退方案
+        使用ffmpeg创建视频的回退方案，包含字幕支持
         """
         try:
             import subprocess
+            import tempfile
             
             # 创建输出目录
             output_dir = os.path.dirname(output_path)
@@ -271,32 +288,104 @@ class MultimodalVideoGenerator:
                 for img_path in image_paths:
                     f.write(f"file '{img_path}'\n")
                     f.write(f"duration {image_duration}\n")
+                # 添加最后一张图片再一次，防止视频末尾黑屏
+                f.write(f"file '{image_paths[-1]}'\n")
+                f.write(f"duration 0.5\n")
             
-            # 使用concat demuxer创建视频
-            subprocess.run([
+            # 创建字幕文件（如果提供了文本）
+            subtitle_file = None
+            if speech_text:
+                subtitle_file = os.path.join(output_dir, "temp_subtitles.srt")
+                self._create_srt_subtitles(speech_text, subtitle_file, duration)
+            
+            # 基本ffmpeg命令
+            ffmpeg_cmd = [
                 "ffmpeg", "-y",
                 "-f", "concat",
                 "-safe", "0",
                 "-i", images_list_file,
-                "-i", merged_audio,
+                "-i", merged_audio
+            ]
+            
+            # 添加字幕（如果有）
+            if subtitle_file:
+                ffmpeg_cmd.extend(["-vf", f"subtitles={subtitle_file}:force_style='FontName=Arial,FontSize=24,PrimaryColour=&H00FFFFFF,OutlineColour=&H000000FF,BorderStyle=3,Outline=1,Shadow=0,Alignment=2'"])
+            else:
+                # 只添加淡入淡出效果
+                ffmpeg_cmd.extend(["-vf", f"fade=t=in:st=0:d=1,fade=t=out:st={duration-1}:d=1"])
+            
+            # 添加其他参数
+            ffmpeg_cmd.extend([
                 "-c:v", "libx264",
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
                 "-shortest",
-                "-vf", "fade=t=in:st=0:d=1,fade=t=out:st=" + str(duration-1) + ":d=1",
-                "-af", "afade=t=in:st=0:d=1,afade=t=out:st=" + str(duration-1) + ":d=1",
+                "-af", f"afade=t=in:st=0:d=1,afade=t=out:st={duration-1}:d=1",
                 output_path
-            ], check=True)
+            ])
+            
+            # 执行ffmpeg命令
+            subprocess.run(ffmpeg_cmd, check=True)
             
             # 清理临时文件
             os.remove(images_list_file)
             os.remove(merged_audio)
+            if subtitle_file:
+                os.remove(subtitle_file)
             
             return output_path
             
         except Exception as e:
             self.logger.error(f"Error in ffmpeg video creation: {str(e)}")
             raise
+    
+    def _create_srt_subtitles(self, text: str, output_file: str, duration: float):
+        """
+        创建SRT格式的字幕文件
+        """
+        try:
+            # 将文本分成几个部分
+            words = text.split()
+            # 每段显示约5秒，计算每段应该有多少单词
+            segments_count = max(1, int(duration / 5))
+            words_per_segment = max(1, len(words) // segments_count)
+            
+            segments = []
+            for i in range(0, len(words), words_per_segment):
+                end_idx = min(i + words_per_segment, len(words))
+                segments.append(" ".join(words[i:end_idx]))
+            
+            # 计算每段的时间
+            segment_duration = duration / len(segments)
+            
+            # 写入SRT文件
+            with open(output_file, 'w', encoding='utf-8') as f:
+                for i, segment in enumerate(segments):
+                    start_time = i * segment_duration
+                    end_time = (i + 1) * segment_duration
+                    
+                    # 格式化时间为SRT格式 (HH:MM:SS,mmm)
+                    start_formatted = self._format_srt_time(start_time)
+                    end_formatted = self._format_srt_time(end_time)
+                    
+                    # 写入字幕条目
+                    f.write(f"{i+1}\n")
+                    f.write(f"{start_formatted} --> {end_formatted}\n")
+                    f.write(f"{segment}\n\n")
+                    
+        except Exception as e:
+            self.logger.error(f"Error creating SRT subtitles: {str(e)}")
+            raise
+    
+    def _format_srt_time(self, seconds: float) -> str:
+        """
+        将秒数格式化为SRT时间格式 (HH:MM:SS,mmm)
+        """
+        hours = int(seconds / 3600)
+        minutes = int((seconds % 3600) / 60)
+        seconds = seconds % 60
+        milliseconds = int((seconds - int(seconds)) * 1000)
+        return f"{hours:02d}:{minutes:02d}:{int(seconds):02d},{milliseconds:03d}"
 
     def _create_slideshow_video(
         self,
@@ -322,7 +411,8 @@ class MultimodalVideoGenerator:
                 output_path=output_path,
                 duration=duration,
                 fade_duration=fade_duration,
-                music_volume=music_volume
+                music_volume=music_volume,
+                speech_text=speech_text
             )
             
         try:
@@ -357,6 +447,12 @@ class MultimodalVideoGenerator:
                        .crossfadeout(fade_duration))
                 image_clips.append(clip)
             
+            # 添加最后一帧作为结束帧，防止黑屏
+            final_clip = (ImageClip(image_paths[-1])
+                         .set_duration(2.0)
+                         .set_start(total_duration - 2.0))
+            image_clips.append(final_clip)
+            
             # Create video from image clips
             video = CompositeVideoClip(image_clips, size=(1024, 1024))
             
@@ -365,7 +461,7 @@ class MultimodalVideoGenerator:
                 try:
                     # Split text into segments based on duration
                     words = speech_text.split()
-                    words_per_segment = max(1, len(words) // int(total_duration / 3))
+                    words_per_segment = max(1, len(words) // int(total_duration / 5))  # 每5秒一段字幕
                     segments = [' '.join(words[i:i+words_per_segment]) 
                               for i in range(0, len(words), words_per_segment)]
                     
@@ -375,22 +471,34 @@ class MultimodalVideoGenerator:
                     for i, text in enumerate(segments):
                         start_time = i * segment_duration
                         try:
-                            txt_clip = (TextClip(text, fontsize=30, color='white', stroke_color='black',
-                                              stroke_width=2, font='Arial', size=(video.w, None),
-                                              method='caption')
+                            # 使用更明显的字幕样式
+                            txt_clip = (TextClip(text, 
+                                              fontsize=36,  # 增大字号
+                                              color='white', 
+                                              stroke_color='black',
+                                              stroke_width=2, 
+                                              font='Arial-Bold',  # 使用粗体
+                                              size=(video.w * 0.9, None),  # 宽度为视频宽度的90%
+                                              method='caption',
+                                              align='center')
                                       .set_position(('center', 'bottom'))
+                                      .margin(bottom=50, opacity=0)  # 底部边距
                                       .set_duration(segment_duration)
                                       .set_start(start_time)
                                       .crossfadein(0.5)
                                       .crossfadeout(0.5))
                             subtitle_clips.append(txt_clip)
+                            self.logger.info(f"Added subtitle at {start_time}s: {text[:30]}...")
                         except Exception as e:
                             self.logger.warning(f"Error creating subtitle clip: {str(e)}")
                             continue
                     
                     # Add subtitles to video if any were created successfully
                     if subtitle_clips:
+                        self.logger.info(f"Adding {len(subtitle_clips)} subtitle clips to video")
                         video = CompositeVideoClip([video] + subtitle_clips)
+                    else:
+                        self.logger.warning("No subtitle clips were created successfully")
                 except Exception as e:
                     self.logger.warning(f"Error adding subtitles: {str(e)}")
             
@@ -405,6 +513,7 @@ class MultimodalVideoGenerator:
             video = video.fadeout(2.0)
             
             # Write final video
+            self.logger.info("Writing video file with moviepy...")
             video.write_videofile(output_path, fps=24, codec='libx264', 
                                 audio_codec='aac', preset='medium')
             
@@ -421,7 +530,8 @@ class MultimodalVideoGenerator:
                 output_path=output_path,
                 duration=duration,
                 fade_duration=fade_duration,
-                music_volume=music_volume
+                music_volume=music_volume,
+                speech_text=speech_text
             )
         finally:
             # Clean up moviepy clips
