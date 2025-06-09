@@ -5,32 +5,14 @@ import sys
 from typing import Dict, Any, Optional, List
 import numpy as np
 
-# Try different imports for moviepy
+# 确保moviepy正确导入
 try:
-    from moviepy.editor import ImageClip, AudioFileClip, CompositeAudioClip, TextClip, CompositeVideoClip, concatenate_videoclips
-except ImportError:
-    try:
-        # Alternative import paths
-        from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
-        from moviepy.audio.io.AudioFileClip import AudioFileClip
-        from moviepy.audio.AudioClip import CompositeAudioClip
-        from moviepy.video.VideoClip import TextClip
-        from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
-        from moviepy.video.compositing.concatenate import concatenate_videoclips
-        # Create a custom ImageClip using PIL and ImageSequenceClip
-        from PIL import Image
-        def ImageClip(image_path, duration=None):
-            img = Image.open(image_path)
-            return ImageSequenceClip([np.array(img)], fps=1, durations=[duration])
-    except ImportError:
-        # Fallback to a minimal implementation using only basic libraries
-        logging.warning("MoviePy not fully available. Video creation may be limited.")
-        ImageClip = None
-        AudioFileClip = None
-        CompositeAudioClip = None
-        TextClip = None
-        CompositeVideoClip = None
-        concatenate_videoclips = None
+    from moviepy.editor import VideoFileClip, ImageClip, AudioFileClip, CompositeVideoClip, CompositeAudioClip, TextClip, concatenate_videoclips
+    MOVIEPY_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"Error importing moviepy: {e}")
+    MOVIEPY_AVAILABLE = False
+    VideoFileClip = ImageClip = AudioFileClip = CompositeVideoClip = CompositeAudioClip = TextClip = concatenate_videoclips = None
 
 # 打印 Python 路径以进行调试
 python_paths = sys.path
@@ -97,6 +79,10 @@ class MultimodalVideoGenerator:
         self.image_generator = image_gen
         self.speech_generator = speech_gen
         self.music_generator = music_gen
+        
+        # 检查moviepy是否可用
+        if not MOVIEPY_AVAILABLE:
+            self.logger.warning("MoviePy is not available. Video creation will be limited to ffmpeg fallback.")
         
         self.output_dir = "output_video"
         os.makedirs(self.output_dir, exist_ok=True)
@@ -238,6 +224,80 @@ class MultimodalVideoGenerator:
             # Don't clean up temp files anymore since we want to keep them for ffmpeg fallback
             pass
 
+    def _create_slideshow_video_ffmpeg(
+        self,
+        image_paths: List[str],
+        speech_path: str,
+        music_path: str,
+        output_path: str,
+        duration: Optional[float] = None,
+        fade_duration: float = 1.0,
+        music_volume: float = 0.3
+    ) -> str:
+        """
+        使用ffmpeg创建视频的回退方案
+        """
+        try:
+            import subprocess
+            
+            # 创建输出目录
+            output_dir = os.path.dirname(output_path)
+            os.makedirs(output_dir, exist_ok=True)
+            
+            # 首先合并音频文件
+            merged_audio = os.path.join(output_dir, "temp_merged_audio.wav")
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-i", speech_path,
+                "-i", music_path,
+                "-filter_complex", f"[1:a]volume={music_volume}[a1];[0:a][a1]amix=inputs=2:duration=longest",
+                merged_audio
+            ], check=True)
+            
+            # 计算每张图片的持续时间
+            if duration is None:
+                # 使用音频文件的长度作为视频长度
+                result = subprocess.run([
+                    "ffprobe", "-v", "error", "-show_entries", "format=duration",
+                    "-of", "default=noprint_wrappers=1:nokey=1", merged_audio
+                ], capture_output=True, text=True)
+                duration = float(result.stdout.strip())
+            
+            image_duration = duration / len(image_paths)
+            
+            # 创建一个临时文件列表
+            images_list_file = os.path.join(output_dir, "temp_images_list.txt")
+            with open(images_list_file, 'w') as f:
+                for img_path in image_paths:
+                    f.write(f"file '{img_path}'\n")
+                    f.write(f"duration {image_duration}\n")
+            
+            # 使用concat demuxer创建视频
+            subprocess.run([
+                "ffmpeg", "-y",
+                "-f", "concat",
+                "-safe", "0",
+                "-i", images_list_file,
+                "-i", merged_audio,
+                "-c:v", "libx264",
+                "-pix_fmt", "yuv420p",
+                "-c:a", "aac",
+                "-shortest",
+                "-vf", "fade=t=in:st=0:d=1,fade=t=out:st=" + str(duration-1) + ":d=1",
+                "-af", "afade=t=in:st=0:d=1,afade=t=out:st=" + str(duration-1) + ":d=1",
+                output_path
+            ], check=True)
+            
+            # 清理临时文件
+            os.remove(images_list_file)
+            os.remove(merged_audio)
+            
+            return output_path
+            
+        except Exception as e:
+            self.logger.error(f"Error in ffmpeg video creation: {str(e)}")
+            raise
+
     def _create_slideshow_video(
         self,
         image_paths: List[str],
@@ -251,17 +311,20 @@ class MultimodalVideoGenerator:
     ) -> str:
         """
         Creates a video from images with audio and optional subtitles.
-        
-        Args:
-            image_paths: List of paths to images
-            speech_path: Path to speech audio file
-            music_path: Path to background music file
-            output_path: Path for output video
-            duration: Total video duration (optional)
-            fade_duration: Duration of fade transition between images
-            music_volume: Volume of background music (0.0-1.0)
-            speech_text: Text for subtitles (optional)
         """
+        # 如果moviepy不可用，使用ffmpeg回退方案
+        if not MOVIEPY_AVAILABLE:
+            self.logger.info("Using ffmpeg fallback for video creation...")
+            return self._create_slideshow_video_ffmpeg(
+                image_paths=image_paths,
+                speech_path=speech_path,
+                music_path=music_path,
+                output_path=output_path,
+                duration=duration,
+                fade_duration=fade_duration,
+                music_volume=music_volume
+            )
+            
         try:
             # Load audio clips
             speech_clip = AudioFileClip(speech_path)
@@ -297,36 +360,39 @@ class MultimodalVideoGenerator:
             # Create video from image clips
             video = CompositeVideoClip(image_clips, size=(1024, 1024))
             
-            # Add subtitles if text is provided
+            # Add subtitles if text is provided and TextClip is available
             if speech_text and TextClip is not None:
-                # Split text into segments based on duration
-                words = speech_text.split()
-                words_per_segment = max(1, len(words) // int(total_duration / 3))  # Show ~3 seconds per segment
-                segments = [' '.join(words[i:i+words_per_segment]) 
-                          for i in range(0, len(words), words_per_segment)]
-                
-                subtitle_clips = []
-                segment_duration = total_duration / len(segments)
-                
-                for i, text in enumerate(segments):
-                    start_time = i * segment_duration
-                    try:
-                        txt_clip = (TextClip(text, fontsize=30, color='white', stroke_color='black',
-                                          stroke_width=2, font='Arial', size=(video.w, None),
-                                          method='caption')
-                                  .set_position(('center', 'bottom'))
-                                  .set_duration(segment_duration)
-                                  .set_start(start_time)
-                                  .crossfadein(0.5)
-                                  .crossfadeout(0.5))
-                        subtitle_clips.append(txt_clip)
-                    except Exception as e:
-                        self.logger.warning(f"Error creating subtitle clip: {str(e)}")
-                        continue
-                
-                # Add subtitles to video if any were created successfully
-                if subtitle_clips:
-                    video = CompositeVideoClip([video] + subtitle_clips)
+                try:
+                    # Split text into segments based on duration
+                    words = speech_text.split()
+                    words_per_segment = max(1, len(words) // int(total_duration / 3))
+                    segments = [' '.join(words[i:i+words_per_segment]) 
+                              for i in range(0, len(words), words_per_segment)]
+                    
+                    subtitle_clips = []
+                    segment_duration = total_duration / len(segments)
+                    
+                    for i, text in enumerate(segments):
+                        start_time = i * segment_duration
+                        try:
+                            txt_clip = (TextClip(text, fontsize=30, color='white', stroke_color='black',
+                                              stroke_width=2, font='Arial', size=(video.w, None),
+                                              method='caption')
+                                      .set_position(('center', 'bottom'))
+                                      .set_duration(segment_duration)
+                                      .set_start(start_time)
+                                      .crossfadein(0.5)
+                                      .crossfadeout(0.5))
+                            subtitle_clips.append(txt_clip)
+                        except Exception as e:
+                            self.logger.warning(f"Error creating subtitle clip: {str(e)}")
+                            continue
+                    
+                    # Add subtitles to video if any were created successfully
+                    if subtitle_clips:
+                        video = CompositeVideoClip([video] + subtitle_clips)
+                except Exception as e:
+                    self.logger.warning(f"Error adding subtitles: {str(e)}")
             
             # Combine audio tracks
             music_clip = music_clip.volumex(music_volume)
@@ -345,8 +411,18 @@ class MultimodalVideoGenerator:
             return output_path
             
         except Exception as e:
-            self.logger.error(f"Error in video creation: {str(e)}", exc_info=True)
-            raise
+            self.logger.error(f"Error in moviepy video creation: {str(e)}", exc_info=True)
+            # 如果moviepy失败，尝试使用ffmpeg回退方案
+            self.logger.info("Falling back to ffmpeg for video creation...")
+            return self._create_slideshow_video_ffmpeg(
+                image_paths=image_paths,
+                speech_path=speech_path,
+                music_path=music_path,
+                output_path=output_path,
+                duration=duration,
+                fade_duration=fade_duration,
+                music_volume=music_volume
+            )
         finally:
             # Clean up moviepy clips
             try:
