@@ -158,10 +158,23 @@ class MultimodalVideoGenerator:
             self.logger.info(f"Generating {num_images} images with prompt: '{image_prompt}'")
             image_paths = []
             
-            # 为每张图片添加细微变化，确保多样性
+            # 为每张图片添加更多样化的变化
+            style_variations = [
+                "in a realistic style",
+                "in an artistic style",
+                "with dramatic lighting",
+                "in a cinematic view",
+                "with soft lighting",
+                "from a different perspective",
+                "with detailed textures",
+                "in a minimalist style",
+                "with vibrant colors"
+            ]
+            
             for i in range(num_images):
-                # 为每张图片添加序号和细微变化
-                varied_prompt = f"{image_prompt}, variation {i+1}"
+                # 组合原始提示词和风格变化
+                style = style_variations[i % len(style_variations)]
+                varied_prompt = f"{image_prompt}, {style}, unique variation {i+1}"
                 img_result = self.image_generator.generate_image(prompt=varied_prompt, **image_params)
                 image = img_result["images"][0]
                 image_path = os.path.join(self.output_dir, f"{base_name}_image_{i+1}.png")
@@ -231,179 +244,106 @@ class MultimodalVideoGenerator:
         speech_text: Optional[str] = None
     ) -> str:
         """
-        Creates a video slideshow from multiple images and audio files.
-
+        Creates a video from images with audio and optional subtitles.
+        
         Args:
-            image_paths (List[str]): Paths to the image files
-            speech_path (str): Path to the speech audio file
-            music_path (str): Path to the music audio file
-            output_path (str): Path where the video should be saved
-            duration (Optional[float]): Duration of the video in seconds. If None, uses speech duration.
-            fade_duration (float): Duration of audio fade in/out in seconds
-            music_volume (float): Volume of the background music (0.0 to 1.0)
-            speech_text (Optional[str]): Text for subtitles
-
-        Returns:
-            str: Path to the created video file
+            image_paths: List of paths to images
+            speech_path: Path to speech audio file
+            music_path: Path to background music file
+            output_path: Path for output video
+            duration: Total video duration (optional)
+            fade_duration: Duration of fade transition between images
+            music_volume: Volume of background music (0.0-1.0)
+            speech_text: Text for subtitles (optional)
         """
         try:
-            # Load audio files
-            speech_audio = AudioFileClip(speech_path)
-            music_audio = AudioFileClip(music_path)
+            # Load audio clips
+            speech_clip = AudioFileClip(speech_path)
+            music_clip = AudioFileClip(music_path)
             
-            # Set music volume
-            music_audio = music_audio.set_volume(music_volume)
+            # Calculate durations
+            total_duration = max(speech_clip.duration, music_clip.duration)
+            if duration:
+                total_duration = duration
+                
+            # Extend music if needed with crossfade
+            if music_clip.duration < total_duration:
+                num_loops = int(np.ceil(total_duration / music_clip.duration))
+                music_clips = [music_clip]
+                for i in range(1, num_loops):
+                    start_time = i * music_clip.duration - fade_duration
+                    music_clips.append(music_clip.set_start(start_time))
+                music_clip = CompositeAudioClip(music_clips)
             
-            # If duration not specified, use speech duration
-            if duration is None:
-                duration = speech_audio.duration
-            
-            # Calculate duration per image
-            num_images = len(image_paths)
-            duration_per_image = duration / num_images
-            
-            # Create image clips
+            # Create image clips with transitions
+            image_duration = total_duration / len(image_paths)
             image_clips = []
+            
             for i, img_path in enumerate(image_paths):
-                clip = ImageClip(img_path, duration=duration_per_image)
-                
-                # Add subtitles if text is provided
-                if speech_text and TextClip is not None:
-                    # 将语音文本分成几个部分，每个图片显示一部分
-                    words = speech_text.split()
-                    words_per_image = max(1, len(words) // num_images)
-                    start_idx = i * words_per_image
-                    end_idx = min(start_idx + words_per_image, len(words))
-                    
-                    if start_idx < len(words):
-                        subtitle_text = " ".join(words[start_idx:end_idx])
-                        txt_clip = TextClip(
-                            subtitle_text, 
-                            fontsize=24, 
-                            color='white',
-                            bg_color='black',
-                            method='caption',
-                            align='center',
-                            size=(clip.w, None)
-                        ).set_position(('center', 'bottom')).set_duration(duration_per_image)
-                        
-                        clip = CompositeVideoClip([clip, txt_clip])
-                
+                start_time = i * image_duration
+                clip = (ImageClip(img_path)
+                       .set_duration(image_duration + fade_duration)
+                       .set_start(start_time)
+                       .crossfadein(fade_duration)
+                       .crossfadeout(fade_duration))
                 image_clips.append(clip)
             
-            # Concatenate all image clips
-            final_video = concatenate_videoclips(image_clips)
+            # Create video from image clips
+            video = CompositeVideoClip(image_clips, size=(1024, 1024))
             
-            # Adjust music length
-            if music_audio.duration < duration:
-                # Calculate how many times we need to loop the music
-                repeats = int(duration / music_audio.duration) + 1
-                # Create a list of music clips
-                music_clips = [music_audio] * repeats
-                # Concatenate them
-                from moviepy.editor import concatenate_audioclips
-                music_audio = concatenate_audioclips(music_clips)
-            
-            # Trim music to exact duration
-            music_audio = music_audio.set_duration(duration)
-            
-            # Add fade effects to music
-            music_audio = music_audio.audio_fadein(fade_duration).audio_fadeout(fade_duration)
+            # Add subtitles if text is provided
+            if speech_text:
+                # Split text into segments based on duration
+                words = speech_text.split()
+                words_per_segment = max(1, len(words) // int(total_duration / 3))  # Show ~3 seconds per segment
+                segments = [' '.join(words[i:i+words_per_segment]) 
+                          for i in range(0, len(words), words_per_segment)]
+                
+                subtitle_clips = []
+                segment_duration = total_duration / len(segments)
+                
+                for i, text in enumerate(segments):
+                    start_time = i * segment_duration
+                    txt_clip = (TextClip(text, fontsize=30, color='white', stroke_color='black',
+                                      stroke_width=2, font='Arial', size=(video.w, None),
+                                      method='caption')
+                              .set_position(('center', 'bottom'))
+                              .set_duration(segment_duration)
+                              .set_start(start_time)
+                              .crossfadein(0.5)
+                              .crossfadeout(0.5))
+                    subtitle_clips.append(txt_clip)
+                
+                # Add subtitles to video
+                video = CompositeVideoClip([video] + subtitle_clips)
             
             # Combine audio tracks
-            final_audio = CompositeAudioClip([speech_audio, music_audio])
+            music_clip = music_clip.volumex(music_volume)
+            final_audio = CompositeAudioClip([music_clip, speech_clip])
             
-            # Set audio to video
-            final_video = final_video.set_audio(final_audio)
+            # Set audio to video with smooth fadeout
+            video = video.set_audio(final_audio)
             
-            # Ensure output directory exists
-            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            # Add final fadeout to both video and audio
+            video = video.fadeout(2.0)
             
-            # Write video file
-            final_video.write_videofile(
-                output_path,
-                fps=24,
-                codec='libx264',
-                audio_codec='aac'
-            )
+            # Write final video
+            video.write_videofile(output_path, fps=24, codec='libx264', 
+                                audio_codec='aac', preset='medium')
             
             return output_path
             
         except Exception as e:
-            self.logger.error(f"Failed to create video: {str(e)}")
-            
-            # Fallback: Use ffmpeg directly
-            try:
-                import subprocess
-                
-                # Create output directory
-                output_dir = os.path.dirname(output_path)
-                os.makedirs(output_dir, exist_ok=True)
-                
-                # First merge the audio files
-                merged_audio = os.path.join(output_dir, "temp_merged_audio.wav")
-                subprocess.run([
-                    "ffmpeg", "-y",
-                    "-i", speech_path,
-                    "-i", music_path,
-                    "-filter_complex", "[1:a]volume=0.3[a1];[0:a][a1]amix=inputs=2:duration=longest",
-                    merged_audio
-                ], check=True)
-                
-                # Create a slideshow with ffmpeg
-                if len(image_paths) > 1:
-                    # 创建一个临时文件列表
-                    images_list_file = os.path.join(output_dir, "temp_images_list.txt")
-                    with open(images_list_file, 'w') as f:
-                        for img_path in image_paths:
-                            f.write(f"file '{img_path}'\n")
-                            f.write(f"duration {duration / len(image_paths)}\n")
-                    
-                    # 使用concat demuxer创建视频
-                    subprocess.run([
-                        "ffmpeg", "-y",
-                        "-f", "concat",
-                        "-safe", "0",
-                        "-i", images_list_file,
-                        "-i", merged_audio,
-                        "-c:v", "libx264",
-                        "-pix_fmt", "yuv420p",
-                        "-c:a", "aac",
-                        "-shortest",
-                        output_path
-                    ], check=True)
-                    
-                    # 删除临时文件
-                    os.remove(images_list_file)
-                else:
-                    # 单图片情况
-                    subprocess.run([
-                        "ffmpeg", "-y",
-                        "-loop", "1",
-                        "-i", image_paths[0],
-                        "-i", merged_audio,
-                        "-c:v", "libx264",
-                        "-tune", "stillimage",
-                        "-c:a", "aac",
-                        "-b:a", "192k",
-                        "-shortest",
-                        output_path
-                    ], check=True)
-                
-                # Clean up temporary audio file
-                if os.path.exists(merged_audio):
-                    os.remove(merged_audio)
-                
-                return output_path
-                
-            except Exception as e:
-                self.logger.error(f"Failed to create video with ffmpeg: {str(e)}")
-                # Return the directory containing the individual files
-                return os.path.dirname(output_path)
+            self.logger.error(f"Error in video creation: {str(e)}", exc_info=True)
+            raise
         finally:
-            # Clean up any temporary files
-            if os.path.exists('temp-audio.m4a'):
-                try:
-                    os.remove('temp-audio.m4a')
-                except:
-                    pass 
+            # Clean up moviepy clips and temporary files
+            try:
+                if 'video' in locals(): 
+                    video.close()
+                if 'speech_clip' in locals(): 
+                    speech_clip.close()
+                if 'music_clip' in locals(): 
+                    music_clip.close()
+            except Exception as e:
+                self.logger.warning(f"Error during cleanup: {str(e)}") 
