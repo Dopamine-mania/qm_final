@@ -384,7 +384,8 @@ def get_all_access_urls(port):
     # 获取JupyterHub访问URL
     if 'JUPYTERHUB_SERVICE_PREFIX' in os.environ:
         service_prefix = os.environ['JUPYTERHUB_SERVICE_PREFIX']
-        jupyter_url = f"{service_prefix}proxy/{port}/"
+        # 使用完整的域名
+        jupyter_url = f"https://hub.comp-teach.qmul.ac.uk{service_prefix}proxy/{port}/"
         access_urls.append(("JupyterHub访问", jupyter_url, "通过JupyterHub代理访问（推荐）"))
     
     # 尝试获取公网IP
@@ -424,10 +425,14 @@ if __name__ == '__main__':
             access_urls = get_all_access_urls(port)
             for name, url, desc in access_urls:
                 print(f"\n{name}:")
-                print(f"URL: {url}")
+                print(f"URL: \033[4m{url}\033[0m")  # 添加下划线使链接更明显
                 print(f"说明: {desc}")
             
-            print("\n" + "="*50 + "\n")
+            print("\n" + "="*50)
+            print("\n特别说明：")
+            print("1. JupyterHub访问链接可以直接分享给其他人使用")
+            print("2. 其他链接仅在对应网络环境下可用")
+            print("="*50 + "\n")
             
             # 启动服务器
             app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
