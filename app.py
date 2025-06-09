@@ -6,6 +6,8 @@ import shutil
 import socket
 import json
 import time
+import psutil
+import sys
 from urllib.request import urlopen
 from queue import Queue
 from threading import Thread
@@ -339,23 +341,102 @@ def create_file_url(filepath: str) -> str:
     logger.info(f"为文件 {filepath} 创建URL: {url}")
     return url
 
+def find_and_kill_process_on_port(port):
+    """查找并关闭占用指定端口的进程"""
+    try:
+        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+            try:
+                connections = proc.connections()
+                for conn in connections:
+                    if conn.laddr.port == port:
+                        # 检查是否是Python进程且运行的是当前脚本
+                        if proc.name() == 'python.exe' or proc.name() == 'python':
+                            cmdline = proc.cmdline()
+                            if len(cmdline) > 1 and os.path.basename(__file__) in cmdline[1]:
+                                logger.info(f"找到旧的应用进程 (PID: {proc.pid})，正在终止...")
+                                proc.terminate()
+                                proc.wait(timeout=3)
+                                logger.info(f"成功终止旧进程")
+                                return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+    except Exception as e:
+        logger.error(f"检查端口占用时出错: {str(e)}")
+    return False
+
+def get_all_access_urls(port):
+    """获取所有可能的访问URL"""
+    access_urls = []
+    
+    # 获取本地访问URL
+    local_url = f"http://localhost:{port}"
+    access_urls.append(("本地访问", local_url, "仅限本机访问"))
+    
+    # 获取局域网访问URL
+    try:
+        hostname = socket.gethostname()
+        ip = socket.gethostbyname(hostname)
+        lan_url = f"http://{ip}:{port}"
+        access_urls.append(("局域网访问", lan_url, "同一网络下的其他设备可访问"))
+    except:
+        pass
+    
+    # 获取JupyterHub访问URL
+    if 'JUPYTERHUB_SERVICE_PREFIX' in os.environ:
+        service_prefix = os.environ['JUPYTERHUB_SERVICE_PREFIX']
+        jupyter_url = f"{service_prefix}proxy/{port}/"
+        access_urls.append(("JupyterHub访问", jupyter_url, "通过JupyterHub代理访问（推荐）"))
+    
+    # 尝试获取公网IP
+    try:
+        public_ip = urlopen('https://api.ipify.org').read().decode('utf8')
+        public_url = f"http://{public_ip}:{port}"
+        access_urls.append(("公网访问", public_url, "需要配置端口转发后可从外网访问"))
+    except:
+        pass
+    
+    return access_urls
+
 if __name__ == '__main__':
     # 确保上传目录存在
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     
-    # 获取可能的外部URL
-    external_url = get_external_url()
-    logger.info(f"Flask应用启动，静态文件目录: {app.config['UPLOAD_FOLDER']}")
-    logger.info(f"尝试获取的外部访问URL: {external_url}")
-    logger.info(f"您也可以访问 /access_info 路由查看所有可能的访问方式")
-    
-    # 检测是否在JupyterHub环境中
-    if proxy_prefix:
-        logger.info(f"检测到JupyterHub环境，配置代理前缀: {proxy_prefix}")
-        logger.info(f"检测到JupyterHub环境，服务前缀: {proxy_prefix}")
-    
     # 获取端口号
     port = int(os.environ.get('PORT', 8080))
+    original_port = port
     
-    # 启动服务器
-    app.run(host='0.0.0.0', port=port, debug=True, threaded=True) 
+    # 尝试启动服务器，如果端口被占用则尝试其他端口
+    max_port_attempts = 10
+    for attempt in range(max_port_attempts):
+        try:
+            # 检查是否有旧进程占用端口
+            if find_and_kill_process_on_port(port):
+                logger.info(f"已清理端口 {port} 的旧进程")
+                time.sleep(1)  # 等待端口完全释放
+            
+            logger.info(f"尝试在端口 {port} 启动服务器...")
+            
+            # 在启动前打印访问链接
+            print("\n" + "="*50)
+            print("应用启动中，您可以通过以下链接访问：")
+            print("="*50)
+            
+            access_urls = get_all_access_urls(port)
+            for name, url, desc in access_urls:
+                print(f"\n{name}:")
+                print(f"URL: {url}")
+                print(f"说明: {desc}")
+            
+            print("\n" + "="*50 + "\n")
+            
+            # 启动服务器
+            app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
+            break  # 如果成功启动，跳出循环
+            
+        except OSError as e:
+            if "Address already in use" in str(e) and attempt < max_port_attempts - 1:
+                logger.warning(f"端口 {port} 已被占用，尝试端口 {port + 1}")
+                port += 1
+            else:
+                logger.error(f"无法启动服务器: {str(e)}")
+                raise 
