@@ -121,12 +121,13 @@ class MultimodalVideoGenerator:
         speech_prompt: str,
         music_prompt: str,
         output_filename: str = "final_video.mp4",
-        video_duration: int = 45,  # 默认改为45秒
+        video_duration: int = 45,  # 默认45秒
         image_params: dict = None,
         speech_params: dict = None,
         music_params: dict = None,
-        num_images: int = 9,  # 默认生成9张图片，约5秒切换一次
-        enable_subtitles: bool = True  # 启用字幕
+        num_images: int = 9,  # 默认生成9张图片
+        enable_subtitles: bool = True,  # 启用字幕
+        speech_text: str = None  # 字幕文本
     ) -> str:
         """
         Generates image, speech, and music, then synthesizes them into a single video.
@@ -142,6 +143,7 @@ class MultimodalVideoGenerator:
             music_params (dict, optional): Parameters for MusicGenerator.
             num_images (int): Number of images to generate for the slideshow.
             enable_subtitles (bool): Whether to add subtitles to the video.
+            speech_text (str, optional): Text for subtitles, defaults to speech_prompt if None.
 
         Returns:
             str: The path to the generated video file.
@@ -149,6 +151,10 @@ class MultimodalVideoGenerator:
         image_params = image_params or {}
         speech_params = speech_params or {}
         music_params = music_params or {}
+        
+        # 如果没有提供字幕文本，使用语音文本
+        if speech_text is None:
+            speech_text = speech_prompt
         
         # Create unique temp filenames based on output_filename
         base_name = os.path.splitext(output_filename)[0]
@@ -219,7 +225,7 @@ class MultimodalVideoGenerator:
                 image_paths, speech_path, music_path, 
                 os.path.join(self.output_dir, output_filename), 
                 duration=video_duration,
-                speech_text=speech_prompt if enable_subtitles else None
+                speech_text=speech_text if enable_subtitles else None
             )
             self.logger.info(f"Successfully created video at: {video_path}")
             
@@ -292,7 +298,7 @@ class MultimodalVideoGenerator:
             video = CompositeVideoClip(image_clips, size=(1024, 1024))
             
             # Add subtitles if text is provided
-            if speech_text:
+            if speech_text and TextClip is not None:
                 # Split text into segments based on duration
                 words = speech_text.split()
                 words_per_segment = max(1, len(words) // int(total_duration / 3))  # Show ~3 seconds per segment
@@ -304,18 +310,23 @@ class MultimodalVideoGenerator:
                 
                 for i, text in enumerate(segments):
                     start_time = i * segment_duration
-                    txt_clip = (TextClip(text, fontsize=30, color='white', stroke_color='black',
-                                      stroke_width=2, font='Arial', size=(video.w, None),
-                                      method='caption')
-                              .set_position(('center', 'bottom'))
-                              .set_duration(segment_duration)
-                              .set_start(start_time)
-                              .crossfadein(0.5)
-                              .crossfadeout(0.5))
-                    subtitle_clips.append(txt_clip)
+                    try:
+                        txt_clip = (TextClip(text, fontsize=30, color='white', stroke_color='black',
+                                          stroke_width=2, font='Arial', size=(video.w, None),
+                                          method='caption')
+                                  .set_position(('center', 'bottom'))
+                                  .set_duration(segment_duration)
+                                  .set_start(start_time)
+                                  .crossfadein(0.5)
+                                  .crossfadeout(0.5))
+                        subtitle_clips.append(txt_clip)
+                    except Exception as e:
+                        self.logger.warning(f"Error creating subtitle clip: {str(e)}")
+                        continue
                 
-                # Add subtitles to video
-                video = CompositeVideoClip([video] + subtitle_clips)
+                # Add subtitles to video if any were created successfully
+                if subtitle_clips:
+                    video = CompositeVideoClip([video] + subtitle_clips)
             
             # Combine audio tracks
             music_clip = music_clip.volumex(music_volume)
@@ -337,7 +348,7 @@ class MultimodalVideoGenerator:
             self.logger.error(f"Error in video creation: {str(e)}", exc_info=True)
             raise
         finally:
-            # Clean up moviepy clips and temporary files
+            # Clean up moviepy clips
             try:
                 if 'video' in locals(): 
                     video.close()

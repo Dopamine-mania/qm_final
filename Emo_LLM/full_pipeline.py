@@ -159,20 +159,24 @@ def generate_multimedia_content(
     # 设置输出文件名
     output_filename = f"{emotion_tag}_response.mp4"
     
-    # 生成并合成视频
-    video_path = generator.generate_and_synthesize(
-        image_prompt=image_prompt,
-        speech_prompt=voice_text,
-        music_prompt=music_prompt,
-        output_filename=output_filename,
-        video_duration=45,  # 45秒视频
-        speech_text=voice_text,  # 添加字幕文本
-        num_images=9,  # 生成9张图片，每5秒切换一次
-        enable_subtitles=True
-    )
-    
-    logger.info(f"视频生成完成: {video_path}")
-    return video_path
+    try:
+        # 生成并合成视频
+        video_path = generator.generate_and_synthesize(
+            image_prompt=image_prompt,
+            speech_prompt=voice_text,
+            music_prompt=music_prompt,
+            output_filename=output_filename,
+            video_duration=45,  # 45秒视频
+            num_images=9,  # 生成9张图片，每5秒切换一次
+            enable_subtitles=True,
+            speech_text=voice_text  # 使用语音文本作为字幕
+        )
+        
+        logger.info(f"视频生成完成: {video_path}")
+        return video_path
+    except Exception as e:
+        logger.error(f"视频生成失败: {str(e)}")
+        raise
 
 def print_formatted_response(response: Dict[str, Any]):
     """打印格式化的响应"""
