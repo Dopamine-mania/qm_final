@@ -425,17 +425,34 @@ if __name__ == '__main__':
             access_urls = get_all_access_urls(port)
             for name, url, desc in access_urls:
                 print(f"\n{name}:")
-                print(f"URL: \033[4m{url}\033[0m")  # 添加下划线使链接更明显
+                print(f"URL: {url}")
                 print(f"说明: {desc}")
             
             print("\n" + "="*50)
             print("\n特别说明：")
             print("1. JupyterHub访问链接可以直接分享给其他人使用")
             print("2. 其他链接仅在对应网络环境下可用")
+            print("3. 服务器正在运行中，请勿关闭此终端")
             print("="*50 + "\n")
             
+            # 配置Flask应用
+            if 'JUPYTERHUB_SERVICE_PREFIX' in os.environ:
+                # 在JupyterHub环境中禁用调试模式，避免自动重启
+                debug_mode = False
+                # 确保正确设置代理
+                app.config['PREFERRED_URL_SCHEME'] = 'https'
+                app.config['SERVER_NAME'] = 'hub.comp-teach.qmul.ac.uk'
+            else:
+                debug_mode = True
+            
             # 启动服务器
-            app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
+            app.run(
+                host='0.0.0.0', 
+                port=port, 
+                debug=debug_mode,  # 在JupyterHub环境中禁用调试模式
+                threaded=True,
+                use_reloader=False  # 禁用重载器，避免进程重启
+            )
             break  # 如果成功启动，跳出循环
             
         except OSError as e:
