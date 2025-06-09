@@ -346,9 +346,9 @@ def find_and_kill_process_on_port(port):
     try:
         for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
             try:
-                connections = proc.connections()
+                connections = proc.net_connections()  # 使用net_connections()替代connections()
                 for conn in connections:
-                    if conn.laddr.port == port:
+                    if hasattr(conn, 'laddr') and conn.laddr.port == port:
                         # 检查是否是Python进程且运行的是当前脚本
                         if proc.name() == 'python.exe' or proc.name() == 'python':
                             cmdline = proc.cmdline()
