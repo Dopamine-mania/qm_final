@@ -280,24 +280,33 @@ class MultimodalVideoGenerator:
                 ], capture_output=True, text=True)
                 duration = float(result.stdout.strip())
             
-            image_duration = duration / len(image_paths)
+            # 调整图片持续时间，确保总时长正确
+            base_image_duration = duration / len(image_paths)
             
-            # 创建一个临时文件列表
+            # 创建一个临时文件列表，第一张和最后一张图片时间稍长
             images_list_file = os.path.join(output_dir, "temp_images_list.txt")
             with open(images_list_file, 'w', encoding='utf-8') as f:
-                for img_path in image_paths:
+                # 第一张图片
+                f.write(f"file '{image_paths[0]}'\n")
+                f.write(f"duration {base_image_duration + 0.5}\n")
+                
+                # 中间的图片
+                for img_path in image_paths[1:-1]:
                     f.write(f"file '{img_path}'\n")
-                    f.write(f"duration {image_duration}\n")
-                # 添加最后一张图片再一次，防止视频末尾黑屏
+                    f.write(f"duration {base_image_duration}\n")
+                
+                # 最后一张图片写两次，第二次用于防止黑屏
                 f.write(f"file '{image_paths[-1]}'\n")
-                f.write(f"duration 0.5\n")
+                f.write(f"duration {base_image_duration}\n")
+                f.write(f"file '{image_paths[-1]}'\n")
+                f.write(f"duration 1.0\n")  # 确保最后一帧有足够的显示时间
             
             # 准备字幕（如果提供了文本）
             subtitle_filters = []
             if speech_text:
-                # 将文本分成几个部分
+                # 将文本分成几个部分，每3秒一段字幕
                 words = speech_text.split()
-                segments_count = max(1, int(duration / 5))  # 每5秒一段字幕
+                segments_count = max(1, int(duration / 3))
                 words_per_segment = max(1, len(words) // segments_count)
                 
                 segments = []
@@ -305,28 +314,28 @@ class MultimodalVideoGenerator:
                     end_idx = min(i + words_per_segment, len(words))
                     segments.append(" ".join(words[i:end_idx]))
                 
-                # 计算每段的时间
-                segment_duration = duration / len(segments)
+                # 计算每段的时间，预留一些时间给淡入淡出
+                segment_duration = (duration - 1.0) / len(segments)  # 减去1秒用于首尾的淡入淡出
                 
                 # 为每个字幕段创建一个drawtext过滤器
                 for i, segment in enumerate(segments):
-                    start_time = i * segment_duration
-                    end_time = (i + 1) * segment_duration
+                    start_time = 0.5 + (i * segment_duration)  # 从0.5秒开始，留时间给淡入
+                    end_time = start_time + segment_duration
                     
                     # 转义特殊字符
-                    escaped_text = segment.replace("'", "\\'").replace(":", "\\:")
+                    escaped_text = segment.replace("'", "\\'").replace(":", "\\:").replace(",", "\\,")
                     
-                    # 创建drawtext过滤器
+                    # 创建drawtext过滤器，增加字体大小和可见度
                     text_filter = (
                         f"drawtext=text='{escaped_text}':"
-                        "fontsize=36:"
-                        "fontcolor=white:"
-                        "borderw=2:"  # 文字边框宽度
-                        "bordercolor=black:"  # 边框颜色
+                        "fontsize=45:"  # 增大字号
+                        "fontcolor=white@0.9:"  # 白色，稍微透明
+                        "borderw=3:"  # 增加边框宽度
+                        "bordercolor=black@0.9:"  # 黑色边框，稍微透明
                         "x=(w-text_w)/2:"  # 水平居中
-                        "y=h-text_h-50:"   # 距底部50像素
+                        "y=h-text_h-80:"   # 距底部80像素
                         f"enable='between(t,{start_time},{end_time})':"  # 仅在特定时间段显示
-                        f"alpha='if(lt(t-{start_time},0.5),(t-{start_time})/0.5,if(lt({end_time}-t,0.5),({end_time}-t)/0.5,1))'"  # 淡入淡出效果
+                        f"alpha='if(lt(t-{start_time},0.5),2*(t-{start_time}),if(lt({end_time}-t,0.5),2*({end_time}-t),1))'"  # 更快的淡入淡出效果
                     )
                     subtitle_filters.append(text_filter)
             
@@ -342,8 +351,8 @@ class MultimodalVideoGenerator:
             # 构建视频过滤器
             vf_filters = []
             
-            # 添加淡入淡出效果
-            vf_filters.append(f"fade=t=in:st=0:d=1,fade=t=out:st={duration-1}:d=1")
+            # 添加淡入淡出效果，减少持续时间以避免黑屏
+            vf_filters.append(f"fade=t=in:st=0:d=0.5,fade=t=out:st={duration-0.5}:d=0.5")
             
             # 添加所有字幕过滤器
             if subtitle_filters:
@@ -352,13 +361,16 @@ class MultimodalVideoGenerator:
             # 合并所有视频过滤器
             ffmpeg_cmd.extend(["-vf", ",".join(vf_filters)])
             
-            # 添加其他参数
+            # 添加其他参数，使用更高的视频质量设置
             ffmpeg_cmd.extend([
                 "-c:v", "libx264",
+                "-preset", "slow",  # 更好的压缩
+                "-crf", "18",      # 更高的视频质量
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
+                "-b:a", "192k",    # 更高的音频比特率
                 "-shortest",
-                "-af", f"afade=t=in:st=0:d=1,afade=t=out:st={duration-1}:d=1",
+                "-af", f"afade=t=in:st=0:d=0.5,afade=t=out:st={duration-0.5}:d=0.5",  # 音频淡入淡出时间与视频同步
                 output_path
             ])
             
