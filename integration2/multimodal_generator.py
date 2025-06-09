@@ -256,10 +256,40 @@ class MultimodalVideoGenerator:
         try:
             import subprocess
             import tempfile
+            import platform
             
             # 创建输出目录
             output_dir = os.path.dirname(output_path)
             os.makedirs(output_dir, exist_ok=True)
+            
+            # 根据操作系统选择合适的中文字体
+            if platform.system() == 'Windows':
+                font_name = 'Microsoft YaHei'  # Windows的中文字体
+            elif platform.system() == 'Darwin':
+                font_name = 'PingFang SC'  # macOS的中文字体
+            else:
+                # Linux系统，尝试常见的中文字体
+                available_fonts = [
+                    'Noto Sans CJK SC',
+                    'WenQuanYi Micro Hei',
+                    'Source Han Sans CN',
+                    'DroidSansFallback',
+                ]
+                font_name = 'Noto Sans CJK SC'  # 默认使用Noto字体
+                
+                # 检查字体是否存在
+                try:
+                    font_check = subprocess.run(
+                        ['fc-list', ':lang=zh'],
+                        capture_output=True,
+                        text=True
+                    )
+                    for font in available_fonts:
+                        if font.lower() in font_check.stdout.lower():
+                            font_name = font
+                            break
+                except Exception as e:
+                    self.logger.warning(f"Unable to check fonts: {e}")
             
             # 首先合并音频文件
             merged_audio = os.path.join(output_dir, "temp_merged_audio.wav")
@@ -284,7 +314,7 @@ class MultimodalVideoGenerator:
             
             # 创建一个临时文件列表
             images_list_file = os.path.join(output_dir, "temp_images_list.txt")
-            with open(images_list_file, 'w') as f:
+            with open(images_list_file, 'w', encoding='utf-8') as f:
                 for img_path in image_paths:
                     f.write(f"file '{img_path}'\n")
                     f.write(f"duration {image_duration}\n")
@@ -292,11 +322,11 @@ class MultimodalVideoGenerator:
                 f.write(f"file '{image_paths[-1]}'\n")
                 f.write(f"duration 0.5\n")
             
-            # 创建字幕文件（如果提供了文本）
+            # 创建ASS字幕文件（如果提供了文本）
             subtitle_file = None
             if speech_text:
-                subtitle_file = os.path.join(output_dir, "temp_subtitles.srt")
-                self._create_srt_subtitles(speech_text, subtitle_file, duration)
+                subtitle_file = os.path.join(output_dir, "temp_subtitles.ass")
+                self._create_ass_subtitles(speech_text, subtitle_file, duration, font_name)
             
             # 基本ffmpeg命令
             ffmpeg_cmd = [
@@ -309,10 +339,14 @@ class MultimodalVideoGenerator:
             
             # 添加字幕（如果有）
             if subtitle_file:
-                ffmpeg_cmd.extend(["-vf", f"subtitles={subtitle_file}:force_style='FontName=Arial,FontSize=24,PrimaryColour=&H00FFFFFF,OutlineColour=&H000000FF,BorderStyle=3,Outline=1,Shadow=0,Alignment=2'"])
+                ffmpeg_cmd.extend([
+                    "-vf", f"ass={subtitle_file}"
+                ])
             else:
                 # 只添加淡入淡出效果
-                ffmpeg_cmd.extend(["-vf", f"fade=t=in:st=0:d=1,fade=t=out:st={duration-1}:d=1"])
+                ffmpeg_cmd.extend([
+                    "-vf", f"fade=t=in:st=0:d=1,fade=t=out:st={duration-1}:d=1"
+                ])
             
             # 添加其他参数
             ffmpeg_cmd.extend([
@@ -338,10 +372,10 @@ class MultimodalVideoGenerator:
         except Exception as e:
             self.logger.error(f"Error in ffmpeg video creation: {str(e)}")
             raise
-    
-    def _create_srt_subtitles(self, text: str, output_file: str, duration: float):
+
+    def _create_ass_subtitles(self, text: str, output_file: str, duration: float, font_name: str):
         """
-        创建SRT格式的字幕文件
+        创建ASS格式的字幕文件，支持中文
         """
         try:
             # 将文本分成几个部分
@@ -358,34 +392,49 @@ class MultimodalVideoGenerator:
             # 计算每段的时间
             segment_duration = duration / len(segments)
             
-            # 写入SRT文件
+            # 写入ASS文件头
             with open(output_file, 'w', encoding='utf-8') as f:
+                f.write("[Script Info]\n")
+                f.write("ScriptType: v4.00+\n")
+                f.write("PlayResX: 1024\n")
+                f.write("PlayResY: 1024\n")
+                f.write("Collisions: Normal\n\n")
+                
+                f.write("[V4+ Styles]\n")
+                f.write("Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n")
+                f.write(f"Style: Default,{font_name},36,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,1,0,0,0,100,100,0,0,1,2,0,2,20,20,50,1\n\n")
+                
+                f.write("[Events]\n")
+                f.write("Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n")
+                
+                # 写入字幕事件
                 for i, segment in enumerate(segments):
                     start_time = i * segment_duration
                     end_time = (i + 1) * segment_duration
                     
-                    # 格式化时间为SRT格式 (HH:MM:SS,mmm)
-                    start_formatted = self._format_srt_time(start_time)
-                    end_formatted = self._format_srt_time(end_time)
+                    # 格式化时间为ASS格式 (H:MM:SS.cc)
+                    start_formatted = self._format_ass_time(start_time)
+                    end_formatted = self._format_ass_time(end_time)
+                    
+                    # 添加淡入淡出效果
+                    text_with_fx = "{\\fad(500,500)}" + segment
                     
                     # 写入字幕条目
-                    f.write(f"{i+1}\n")
-                    f.write(f"{start_formatted} --> {end_formatted}\n")
-                    f.write(f"{segment}\n\n")
+                    f.write(f"Dialogue: 0,{start_formatted},{end_formatted},Default,,0,0,0,,{text_with_fx}\n")
                     
         except Exception as e:
-            self.logger.error(f"Error creating SRT subtitles: {str(e)}")
+            self.logger.error(f"Error creating ASS subtitles: {str(e)}")
             raise
     
-    def _format_srt_time(self, seconds: float) -> str:
+    def _format_ass_time(self, seconds: float) -> str:
         """
-        将秒数格式化为SRT时间格式 (HH:MM:SS,mmm)
+        将秒数格式化为ASS时间格式 (H:MM:SS.cc)
         """
         hours = int(seconds / 3600)
         minutes = int((seconds % 3600) / 60)
-        seconds = seconds % 60
-        milliseconds = int((seconds - int(seconds)) * 1000)
-        return f"{hours:02d}:{minutes:02d}:{int(seconds):02d},{milliseconds:03d}"
+        seconds_part = seconds % 60
+        centiseconds = int((seconds_part - int(seconds_part)) * 100)
+        return f"{hours}:{minutes:02d}:{int(seconds_part):02d}.{centiseconds:02d}"
 
     def _create_slideshow_video(
         self,
