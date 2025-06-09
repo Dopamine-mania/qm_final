@@ -67,7 +67,7 @@ class MusicGenerator(BaseMusicGenerator):
     def generate_music(
         self,
         prompt: str,
-        duration_secs: int = 10,
+        duration_secs: int = 45,
         lyrics: str = "",
         infer_step: int = 100,
         guidance_scale: float = 3.5,
@@ -95,21 +95,21 @@ class MusicGenerator(BaseMusicGenerator):
             # We need to run it, then load the audio back to return the array.
             temp_output_filename = os.path.join(os.path.dirname(__file__), "temp_acestep_output.wav")
 
-            # Default ACEStep parameters based on working examples
+            # 优化后的ACEStep参数，适合生成更长时间的音乐
             params = {
                 'audio_duration': float(duration_secs),
                 'prompt': prompt,
                 'lyrics': lyrics,
                 'infer_step': infer_step,
                 'guidance_scale': guidance_scale,
-                'scheduler_type': 'euler',  # Changed from dpm++ to euler based on working examples
-                'cfg_type': 'apg',  # Changed from self-attention-v to apg based on working examples
-                'omega_scale': 10.0,  # Adjusted based on working examples
-                'guidance_interval': 0.5,  # Adjusted based on working examples
-                'guidance_interval_decay': 0.0,  # Adjusted based on working examples
-                'min_guidance_scale': 3.0,  # Adjusted based on working examples
+                'scheduler_type': 'euler',
+                'cfg_type': 'apg',
+                'omega_scale': 12.0,  # 增加omega_scale以增强音乐连贯性
+                'guidance_interval': 0.6,  # 调整guidance_interval以提高音乐质量
+                'guidance_interval_decay': 0.1,  # 添加衰减以保持长音乐的连贯性
+                'min_guidance_scale': 3.5,  # 增加最小引导比例
                 'use_erg_tag': True,
-                'use_erg_lyric': False,  # Changed to False based on working examples
+                'use_erg_lyric': False,
                 'use_erg_diffusion': True,
                 'guidance_scale_text': 0.0,
                 'guidance_scale_lyric': 0.0,
@@ -117,7 +117,7 @@ class MusicGenerator(BaseMusicGenerator):
             }
             params.update(kwargs)
 
-            self.logger.info(f"Running ACEStep pipeline with prompt: '{prompt}'")
+            self.logger.info(f"Running ACEStep pipeline with prompt: '{prompt}' for {duration_secs} seconds")
             self.pipeline(**params)
 
             if not os.path.exists(temp_output_filename):

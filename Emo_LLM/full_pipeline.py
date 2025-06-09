@@ -165,7 +165,7 @@ def generate_multimedia_content(
         speech_prompt=voice_text,
         music_prompt=music_prompt,
         output_filename=output_filename,
-        video_duration=30  # 30秒视频
+        video_duration=45  # 修改为45秒视频
     )
     
     logger.info(f"视频生成完成: {video_path}")

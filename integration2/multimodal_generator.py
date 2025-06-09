@@ -2,18 +2,21 @@ import os
 import logging
 import torch
 import sys
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import numpy as np
 
 # Try different imports for moviepy
 try:
-    from moviepy.editor import ImageClip, AudioFileClip, CompositeAudioClip
+    from moviepy.editor import ImageClip, AudioFileClip, CompositeAudioClip, TextClip, CompositeVideoClip, concatenate_videoclips
 except ImportError:
     try:
         # Alternative import paths
         from moviepy.video.io.ImageSequenceClip import ImageSequenceClip
         from moviepy.audio.io.AudioFileClip import AudioFileClip
         from moviepy.audio.AudioClip import CompositeAudioClip
+        from moviepy.video.VideoClip import TextClip
+        from moviepy.video.compositing.CompositeVideoClip import CompositeVideoClip
+        from moviepy.video.compositing.concatenate import concatenate_videoclips
         # Create a custom ImageClip using PIL and ImageSequenceClip
         from PIL import Image
         def ImageClip(image_path, duration=None):
@@ -25,6 +28,9 @@ except ImportError:
         ImageClip = None
         AudioFileClip = None
         CompositeAudioClip = None
+        TextClip = None
+        CompositeVideoClip = None
+        concatenate_videoclips = None
 
 # 打印 Python 路径以进行调试
 python_paths = sys.path
@@ -115,10 +121,12 @@ class MultimodalVideoGenerator:
         speech_prompt: str,
         music_prompt: str,
         output_filename: str = "final_video.mp4",
-        video_duration: int = 10,
+        video_duration: int = 45,  # 默认改为45秒
         image_params: dict = None,
         speech_params: dict = None,
-        music_params: dict = None
+        music_params: dict = None,
+        num_images: int = 9,  # 默认生成9张图片，约5秒切换一次
+        enable_subtitles: bool = True  # 启用字幕
     ) -> str:
         """
         Generates image, speech, and music, then synthesizes them into a single video.
@@ -132,6 +140,8 @@ class MultimodalVideoGenerator:
             image_params (dict, optional): Parameters for ImageGenerator.
             speech_params (dict, optional): Parameters for SpeechGenerator.
             music_params (dict, optional): Parameters for MusicGenerator.
+            num_images (int): Number of images to generate for the slideshow.
+            enable_subtitles (bool): Whether to add subtitles to the video.
 
         Returns:
             str: The path to the generated video file.
@@ -144,13 +154,20 @@ class MultimodalVideoGenerator:
         base_name = os.path.splitext(output_filename)[0]
         temp_files = []
         try:
-            # 1. Generate Image
-            self.logger.info(f"Generating image with prompt: '{image_prompt}'")
-            img_result = self.image_generator.generate_image(prompt=image_prompt, **image_params)
-            image = img_result["images"][0]
-            image_path = os.path.join(self.output_dir, f"{base_name}_image.png")
-            self.image_generator.save_image(image, image_path)
-            temp_files.append(image_path)
+            # 1. Generate Multiple Images
+            self.logger.info(f"Generating {num_images} images with prompt: '{image_prompt}'")
+            image_paths = []
+            
+            # 为每张图片添加细微变化，确保多样性
+            for i in range(num_images):
+                # 为每张图片添加序号和细微变化
+                varied_prompt = f"{image_prompt}, variation {i+1}"
+                img_result = self.image_generator.generate_image(prompt=varied_prompt, **image_params)
+                image = img_result["images"][0]
+                image_path = os.path.join(self.output_dir, f"{base_name}_image_{i+1}.png")
+                self.image_generator.save_image(image, image_path)
+                image_paths.append(image_path)
+                temp_files.append(image_path)
 
             # 2. Generate Speech
             self.logger.info(f"Generating speech for text: '{speech_prompt}'")
@@ -174,23 +191,22 @@ class MultimodalVideoGenerator:
             
             # 4. Verify file independence
             self.logger.info("Verifying file independence...")
-            self.logger.info(f"Image file: {image_path}")
+            self.logger.info(f"Image files: {len(image_paths)} images generated")
             self.logger.info(f"Speech file: {speech_path}")
             self.logger.info(f"Music file: {music_path}")
             
-            # Ensure the files exist and belong to the current scene
-            for file_path in [image_path, speech_path, music_path]:
+            # Ensure the files exist
+            for file_path in image_paths + [speech_path, music_path]:
                 if not os.path.exists(file_path):
                     raise FileNotFoundError(f"Required file not found: {file_path}")
-                if base_name not in file_path:
-                    raise ValueError(f"File {file_path} does not belong to the current scene ({base_name})")
             
             # 5. Synthesize Video
             self.logger.info("Synthesizing video from generated content...")
-            video_path = self._create_video(
-                image_path, speech_path, music_path, 
+            video_path = self._create_slideshow_video(
+                image_paths, speech_path, music_path, 
                 os.path.join(self.output_dir, output_filename), 
-                duration=video_duration
+                duration=video_duration,
+                speech_text=speech_prompt if enable_subtitles else None
             )
             self.logger.info(f"Successfully created video at: {video_path}")
             
@@ -203,27 +219,29 @@ class MultimodalVideoGenerator:
             # Don't clean up temp files anymore since we want to keep them for ffmpeg fallback
             pass
 
-    def _create_video(
+    def _create_slideshow_video(
         self,
-        image_path: str,
+        image_paths: List[str],
         speech_path: str,
         music_path: str,
         output_path: str,
         duration: Optional[float] = None,
         fade_duration: float = 1.0,
-        music_volume: float = 0.3
+        music_volume: float = 0.3,
+        speech_text: Optional[str] = None
     ) -> str:
         """
-        Creates a video from an image and audio files.
+        Creates a video slideshow from multiple images and audio files.
 
         Args:
-            image_path (str): Path to the image file
+            image_paths (List[str]): Paths to the image files
             speech_path (str): Path to the speech audio file
             music_path (str): Path to the music audio file
             output_path (str): Path where the video should be saved
             duration (Optional[float]): Duration of the video in seconds. If None, uses speech duration.
             fade_duration (float): Duration of audio fade in/out in seconds
             music_volume (float): Volume of the background music (0.0 to 1.0)
+            speech_text (Optional[str]): Text for subtitles
 
         Returns:
             str: Path to the created video file
@@ -240,8 +258,41 @@ class MultimodalVideoGenerator:
             if duration is None:
                 duration = speech_audio.duration
             
-            # Create image clip with duration
-            image_clip = ImageClip(image_path, duration=duration)
+            # Calculate duration per image
+            num_images = len(image_paths)
+            duration_per_image = duration / num_images
+            
+            # Create image clips
+            image_clips = []
+            for i, img_path in enumerate(image_paths):
+                clip = ImageClip(img_path, duration=duration_per_image)
+                
+                # Add subtitles if text is provided
+                if speech_text and TextClip is not None:
+                    # 将语音文本分成几个部分，每个图片显示一部分
+                    words = speech_text.split()
+                    words_per_image = max(1, len(words) // num_images)
+                    start_idx = i * words_per_image
+                    end_idx = min(start_idx + words_per_image, len(words))
+                    
+                    if start_idx < len(words):
+                        subtitle_text = " ".join(words[start_idx:end_idx])
+                        txt_clip = TextClip(
+                            subtitle_text, 
+                            fontsize=24, 
+                            color='white',
+                            bg_color='black',
+                            method='caption',
+                            align='center',
+                            size=(clip.w, None)
+                        ).set_position(('center', 'bottom')).set_duration(duration_per_image)
+                        
+                        clip = CompositeVideoClip([clip, txt_clip])
+                
+                image_clips.append(clip)
+            
+            # Concatenate all image clips
+            final_video = concatenate_videoclips(image_clips)
             
             # Adjust music length
             if music_audio.duration < duration:
@@ -263,7 +314,7 @@ class MultimodalVideoGenerator:
             final_audio = CompositeAudioClip([speech_audio, music_audio])
             
             # Set audio to video
-            final_video = image_clip.set_audio(final_audio)
+            final_video = final_video.set_audio(final_audio)
             
             # Ensure output directory exists
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -299,19 +350,45 @@ class MultimodalVideoGenerator:
                     merged_audio
                 ], check=True)
                 
-                # Then create the video
-                subprocess.run([
-                    "ffmpeg", "-y",
-                    "-loop", "1",
-                    "-i", image_path,
-                    "-i", merged_audio,
-                    "-c:v", "libx264",
-                    "-tune", "stillimage",
-                    "-c:a", "aac",
-                    "-b:a", "192k",
-                    "-shortest",
-                    output_path
-                ], check=True)
+                # Create a slideshow with ffmpeg
+                if len(image_paths) > 1:
+                    # 创建一个临时文件列表
+                    images_list_file = os.path.join(output_dir, "temp_images_list.txt")
+                    with open(images_list_file, 'w') as f:
+                        for img_path in image_paths:
+                            f.write(f"file '{img_path}'\n")
+                            f.write(f"duration {duration / len(image_paths)}\n")
+                    
+                    # 使用concat demuxer创建视频
+                    subprocess.run([
+                        "ffmpeg", "-y",
+                        "-f", "concat",
+                        "-safe", "0",
+                        "-i", images_list_file,
+                        "-i", merged_audio,
+                        "-c:v", "libx264",
+                        "-pix_fmt", "yuv420p",
+                        "-c:a", "aac",
+                        "-shortest",
+                        output_path
+                    ], check=True)
+                    
+                    # 删除临时文件
+                    os.remove(images_list_file)
+                else:
+                    # 单图片情况
+                    subprocess.run([
+                        "ffmpeg", "-y",
+                        "-loop", "1",
+                        "-i", image_paths[0],
+                        "-i", merged_audio,
+                        "-c:v", "libx264",
+                        "-tune", "stillimage",
+                        "-c:a", "aac",
+                        "-b:a", "192k",
+                        "-shortest",
+                        output_path
+                    ], check=True)
                 
                 # Clean up temporary audio file
                 if os.path.exists(merged_audio):

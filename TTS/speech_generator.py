@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 import numpy as np
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from scipy.io.wavfile import write as write_wav
 from base_speech_generator import BaseSpeechGenerator
 
@@ -112,6 +112,7 @@ class SpeechGenerator(BaseSpeechGenerator):
         laugh: Optional[int] = 0,
         break_val: Optional[int] = 6,
         temperature: float = 0.3,
+        generate_subtitles: bool = True,  # 添加字幕生成选项
         **kwargs
     ) -> Dict[str, Any]:
         """
@@ -125,6 +126,7 @@ class SpeechGenerator(BaseSpeechGenerator):
             laugh (int, optional): Laugh level.
             break_val (int, optional): Break level.
             temperature (float, optional): Sampling temperature.
+            generate_subtitles (bool, optional): Whether to generate subtitles. Defaults to True.
             **kwargs: Additional arguments for chat.infer().
 
         Returns:
@@ -152,15 +154,68 @@ class SpeechGenerator(BaseSpeechGenerator):
             # Extract the first audio array
             audio_array = wavs[0]
 
+            # 生成字幕数据
+            subtitles = None
+            if generate_subtitles:
+                subtitles = self._generate_subtitles(text, len(audio_array) / SAMPLE_RATE)
+
             return {
                 "audio": audio_array,
                 "sample_rate": SAMPLE_RATE,  # 使用固定的采样率
                 "text": text,
-                "speaker_embedding": speaker
+                "speaker_embedding": speaker,
+                "subtitles": subtitles  # 添加字幕数据
             }
         except Exception as e:
             self.logger.error(f"Error generating speech: {e}")
             raise
+
+    def _generate_subtitles(self, text: str, duration: float) -> List[Dict[str, Any]]:
+        """
+        生成简单的字幕数据
+
+        Args:
+            text (str): 语音文本
+            duration (float): 音频时长（秒）
+
+        Returns:
+            List[Dict[str, Any]]: 字幕数据列表，每项包含开始时间、结束时间和文本
+        """
+        # 简单的字幕生成算法：按句子或标点符号分割文本
+        import re
+        
+        # 分割句子
+        sentences = re.split(r'([.!?。！？])', text)
+        sentences = [''.join(i) for i in zip(sentences[0::2], sentences[1::2] + [''] * (len(sentences) % 2))]
+        sentences = [s.strip() for s in sentences if s.strip()]
+        
+        if not sentences:
+            sentences = [text]
+            
+        # 计算每个句子的大致时长
+        total_chars = sum(len(s) for s in sentences)
+        char_duration = duration / total_chars if total_chars > 0 else duration
+        
+        subtitles = []
+        current_time = 0
+        
+        for sentence in sentences:
+            if not sentence:
+                continue
+                
+            # 估算句子时长
+            sentence_duration = len(sentence) * char_duration
+            
+            # 添加字幕条目
+            subtitles.append({
+                "start": current_time,
+                "end": current_time + sentence_duration,
+                "text": sentence
+            })
+            
+            current_time += sentence_duration
+            
+        return subtitles
 
     def save_audio(self, audio_data: np.ndarray, output_path: str, sample_rate: int = SAMPLE_RATE):
         """
