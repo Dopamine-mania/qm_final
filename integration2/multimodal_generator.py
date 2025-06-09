@@ -251,7 +251,7 @@ class MultimodalVideoGenerator:
         speech_text: Optional[str] = None
     ) -> str:
         """
-        使用ffmpeg创建视频的回退方案，使用drawtext过滤器添加字幕
+        使用ffmpeg创建视频的回退方案，使用drawtext过滤器直接添加字幕
         """
         try:
             import subprocess
@@ -292,11 +292,43 @@ class MultimodalVideoGenerator:
                 f.write(f"file '{image_paths[-1]}'\n")
                 f.write(f"duration 0.5\n")
             
-            # 创建字幕文本文件（如果提供了文本）
-            subtitle_file = None
+            # 准备字幕（如果提供了文本）
+            subtitle_filters = []
             if speech_text:
-                subtitle_file = os.path.join(output_dir, "temp_subtitles.txt")
-                self._create_text_segments(speech_text, subtitle_file, duration)
+                # 将文本分成几个部分
+                words = speech_text.split()
+                segments_count = max(1, int(duration / 5))  # 每5秒一段字幕
+                words_per_segment = max(1, len(words) // segments_count)
+                
+                segments = []
+                for i in range(0, len(words), words_per_segment):
+                    end_idx = min(i + words_per_segment, len(words))
+                    segments.append(" ".join(words[i:end_idx]))
+                
+                # 计算每段的时间
+                segment_duration = duration / len(segments)
+                
+                # 为每个字幕段创建一个drawtext过滤器
+                for i, segment in enumerate(segments):
+                    start_time = i * segment_duration
+                    end_time = (i + 1) * segment_duration
+                    
+                    # 转义特殊字符
+                    escaped_text = segment.replace("'", "\\'").replace(":", "\\:")
+                    
+                    # 创建drawtext过滤器
+                    text_filter = (
+                        f"drawtext=text='{escaped_text}':"
+                        "fontsize=36:"
+                        "fontcolor=white:"
+                        "borderw=2:"  # 文字边框宽度
+                        "bordercolor=black:"  # 边框颜色
+                        "x=(w-text_w)/2:"  # 水平居中
+                        "y=h-text_h-50:"   # 距底部50像素
+                        f"enable='between(t,{start_time},{end_time})':"  # 仅在特定时间段显示
+                        f"alpha='if(lt(t-{start_time},0.5),(t-{start_time})/0.5,if(lt({end_time}-t,0.5),({end_time}-t)/0.5,1))'"  # 淡入淡出效果
+                    )
+                    subtitle_filters.append(text_filter)
             
             # 基本ffmpeg命令
             ffmpeg_cmd = [
@@ -313,21 +345,9 @@ class MultimodalVideoGenerator:
             # 添加淡入淡出效果
             vf_filters.append(f"fade=t=in:st=0:d=1,fade=t=out:st={duration-1}:d=1")
             
-            # 添加字幕（如果有）
-            if subtitle_file:
-                # 使用drawtext过滤器添加字幕
-                text_filter = (
-                    f"drawtext=textfile={subtitle_file}:"
-                    "fontsize=36:"
-                    "fontcolor=white:"
-                    "borderw=2:"  # 文字边框宽度
-                    "bordercolor=black:"  # 边框颜色
-                    "x=(w-text_w)/2:"  # 水平居中
-                    "y=h-text_h-50:"   # 距底部50像素
-                    "reload=1:"  # 允许实时重新加载文本
-                    "alpha='if(lt(t,0.5),t/0.5,if(lt(t,{duration}),1,{duration}+0.5-t))*0.95'"  # 淡入淡出效果
-                )
-                vf_filters.append(text_filter)
+            # 添加所有字幕过滤器
+            if subtitle_filters:
+                vf_filters.extend(subtitle_filters)
             
             # 合并所有视频过滤器
             ffmpeg_cmd.extend(["-vf", ",".join(vf_filters)])
@@ -350,56 +370,11 @@ class MultimodalVideoGenerator:
             # 清理临时文件
             os.remove(images_list_file)
             os.remove(merged_audio)
-            if subtitle_file:
-                os.remove(subtitle_file)
             
             return output_path
             
         except Exception as e:
             self.logger.error(f"Error in ffmpeg video creation: {str(e)}")
-            raise
-
-    def _create_text_segments(self, text: str, output_file: str, duration: float):
-        """
-        创建分段的字幕文本文件
-        """
-        try:
-            # 将文本分成几个部分
-            words = text.split()
-            # 每段显示约5秒，计算每段应该有多少单词
-            segments_count = max(1, int(duration / 5))
-            words_per_segment = max(1, len(words) // segments_count)
-            
-            segments = []
-            for i in range(0, len(words), words_per_segment):
-                end_idx = min(i + words_per_segment, len(words))
-                segments.append(" ".join(words[i:end_idx]))
-            
-            # 写入文本文件
-            with open(output_file, 'w', encoding='utf-8') as f:
-                f.write(segments[0])  # 写入第一段
-                
-            # 创建一个定时更新字幕的脚本
-            update_script = os.path.join(os.path.dirname(output_file), "update_subtitles.sh")
-            with open(update_script, 'w', encoding='utf-8') as f:
-                f.write("#!/bin/bash\n\n")
-                
-                segment_duration = duration / len(segments)
-                for i, segment in enumerate(segments[1:], 1):
-                    delay = i * segment_duration
-                    f.write(f'sleep {delay}\n')
-                    f.write(f'echo "{segment}" > "{output_file}"\n')
-            
-            # 使脚本可执行
-            os.chmod(update_script, 0o755)
-            
-            # 在后台运行更新脚本
-            subprocess.Popen(['bash', update_script], 
-                           stdout=subprocess.DEVNULL, 
-                           stderr=subprocess.DEVNULL)
-            
-        except Exception as e:
-            self.logger.error(f"Error creating text segments: {str(e)}")
             raise
 
     def _create_slideshow_video(
